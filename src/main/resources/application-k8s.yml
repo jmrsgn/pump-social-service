@@ -8,4 +8,4 @@ spring:
 
 logging:
   level:
-    com.johnmartin.pump: INFO
+    com.johnmartin.social: INFO

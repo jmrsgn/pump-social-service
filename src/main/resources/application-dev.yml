@@ -7,4 +7,4 @@ auth:
 
 logging:
   level:
-    com.johnmartin.pump: DEBUG
+    com.johnmartin.social: DEBUG
