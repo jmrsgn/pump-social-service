@@ -18,6 +18,10 @@ public class ApiErrorMessages {
         public static final String EMAIL_MUST_BE_VALID = "Email must be valid";
         public static final String YOU_ARE_NOT_ALLOWED_TO_ACCESS_THIS_RESOURCE = "You are not allowed to access this resource";
         public static final String YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION = "You are not authorized to perform this action.";
+        public static final String USER_ID_IS_MISSING_IN_REQUEST = "User ID is missing in request";
+        public static final String FIRST_NAME_IS_REQUIRED = "First name is required";
+        public static final String LAST_NAME_IS_REQUIRED = "Last name is required";
+        public static final String USER_CREATION_FAILED = "User creation failed";
     }
 
     public static class Post {

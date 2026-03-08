@@ -6,12 +6,15 @@ import com.johnmartin.social.entities.UserEntity;
 public class UserMapper {
 
     public static UserResponse toResponse(UserEntity userEntity) {
-        return new UserResponse(userEntity.getId(),
-                                userEntity.getFirstName(),
-                                userEntity.getLastName(),
-                                userEntity.getEmail(),
-                                userEntity.getPhone(),
-                                userEntity.getRole(),
-                                userEntity.getProfileImageUrl());
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(userResponse.getId());
+        userResponse.setFirstName(userEntity.getFirstName());
+        userResponse.setLastName(userEntity.getLastName());
+        userResponse.setEmail(userEntity.getEmail());
+        userResponse.setProfileImageUrl(userEntity.getProfileImageUrl());
+        userResponse.setBio(userEntity.getBio());
+        userResponse.setFollowersNo(userResponse.getFollowersNo());
+        userResponse.setFollowingNo(userResponse.getFollowingNo());
+        return userResponse;
     }
 }

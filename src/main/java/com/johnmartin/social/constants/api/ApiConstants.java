@@ -16,6 +16,7 @@ public class ApiConstants {
         // User
         public static final String API_USER = API_BASE_V1 + "/user";
         public static final String PROFILE = "/profile";
+        public static final String CREATE = "/create";
 
         // Post
         public static final String API_POST = API_BASE_V1 + "/post";
@@ -42,7 +43,8 @@ public class ApiConstants {
     }
 
     public static class PumpAuthService {
-        public static final String URL = "http://pump-auth-service:8080";
+        // public static final String URL = "http://pump-auth-service:8080";
+        public static final String URL = "http://localhost:8081";
         public static final String API_VALIDATE = API_BASE_V1 + "/internal/auth/validate";
     }
 }
