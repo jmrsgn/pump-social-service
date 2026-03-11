@@ -12,7 +12,7 @@ import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.security.filter.AuthContextFilter;
 import com.johnmartin.social.security.filter.CorrelationIdFilter;
 import com.johnmartin.social.security.filter.RequestLoggingFilter;
-import com.johnmartin.social.service.AuthService;
+import com.johnmartin.social.service.AuthServiceClient;
 
 @Configuration
 public class SecurityConfig {
@@ -28,7 +28,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthContextFilter authContextFilter(AuthService authService, ObjectMapper objectMapper) {
+    public AuthContextFilter authContextFilter(AuthServiceClient authService, ObjectMapper objectMapper) {
         return new AuthContextFilter(authService, objectMapper);
     }
 

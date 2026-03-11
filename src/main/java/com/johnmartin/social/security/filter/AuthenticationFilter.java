@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.exception.UnauthorizedException;
-import com.johnmartin.social.service.AuthService;
+import com.johnmartin.social.service.AuthServiceClient;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AuthenticationFilter extends BaseFilter {
 
     @Autowired
-    private AuthService authService;
+    private AuthServiceClient authService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -38,6 +38,9 @@ public class AuthenticationFilter extends BaseFilter {
 
     @Override
     protected boolean shouldSkip(HttpServletRequest request) {
-        return request.getRequestURI().startsWith(ApiConstants.Path.ACTUATOR);
+        String uri = request.getRequestURI();
+
+        return uri.startsWith(ApiConstants.Path.ACTUATOR)
+               || uri.startsWith(ApiConstants.InternalPath.API_USER_INTERNAL);
     }
 }

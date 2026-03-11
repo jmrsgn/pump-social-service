@@ -8,6 +8,7 @@ public class ApiConstants {
     public static final int RETRIES_COUNT = 5;
 
     public static final String API_BASE_V1 = "/api/v1";
+    public static final String API_BASE_V1_INTERNAL = "/api/v1/internal";
 
     public static class Path {
         public static final String ACTUATOR = "/actuator";
@@ -16,7 +17,6 @@ public class ApiConstants {
         // User
         public static final String API_USER = API_BASE_V1 + "/user";
         public static final String PROFILE = "/profile";
-        public static final String CREATE = "/create";
 
         // Post
         public static final String API_POST = API_BASE_V1 + "/post";
@@ -27,6 +27,11 @@ public class ApiConstants {
         public static final String API_COMMENT = API_POST + "/{postId}/comment";
         public static final String COMMENT_INFO = "/{commentId}";
         public static final String COMMENT_LIKE = COMMENT_INFO + "/like";
+    }
+
+    public static class InternalPath {
+        public static final String API_USER_INTERNAL = API_BASE_V1_INTERNAL + "/user";
+        public static final String CREATE_USER = "/create";
     }
 
     public static class Params {
@@ -45,6 +50,6 @@ public class ApiConstants {
     public static class PumpAuthService {
         // public static final String URL = "http://pump-auth-service:8080";
         public static final String URL = "http://localhost:8081";
-        public static final String API_VALIDATE = API_BASE_V1 + "/internal/auth/validate";
+        public static final String API_VALIDATE = API_BASE_V1_INTERNAL + "/auth/validate";
     }
 }

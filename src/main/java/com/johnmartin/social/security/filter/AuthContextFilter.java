@@ -9,16 +9,16 @@ import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.exception.UnauthorizedException;
 import com.johnmartin.social.security.AuthContext;
-import com.johnmartin.social.service.AuthService;
+import com.johnmartin.social.service.AuthServiceClient;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class AuthContextFilter extends BaseFilter {
 
-    private final AuthService authService;
+    private final AuthServiceClient authService;
 
-    public AuthContextFilter(AuthService authService, ObjectMapper objectMapper) {
+    public AuthContextFilter(AuthServiceClient authService, ObjectMapper objectMapper) {
         super(objectMapper);
         this.authService = authService;
     }
@@ -47,6 +47,9 @@ public class AuthContextFilter extends BaseFilter {
 
     @Override
     protected boolean shouldSkip(HttpServletRequest request) {
-        return request.getRequestURI().startsWith(ApiConstants.Path.ACTUATOR);
+        String uri = request.getRequestURI();
+
+        return uri.startsWith(ApiConstants.Path.ACTUATOR)
+               || uri.startsWith(ApiConstants.InternalPath.API_USER_INTERNAL);
     }
 }

@@ -16,7 +16,7 @@ import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.exception.UnauthorizedException;
 
 @Service
-public class AuthService {
+public class AuthServiceClient {
 
     @Autowired
     private RestClient authWebClient;
