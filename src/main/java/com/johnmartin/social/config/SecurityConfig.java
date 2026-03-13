@@ -55,6 +55,9 @@ public class SecurityConfig {
                                                                           ApiConstants.Path.ACTUATOR + ApiConstants.Path.HEALTH
                                                                                                       + "/**")
                                                          .permitAll()
+                                                         .requestMatchers(ApiConstants.InternalPath.API_USER_INTERNAL
+                                                                          + ApiConstants.InternalPath.CREATE_USER)
+                                                         .permitAll()
                                                          .requestMatchers(ApiConstants.Path.ACTUATOR + "/**")
                                                          .denyAll()
                                                          .anyRequest()

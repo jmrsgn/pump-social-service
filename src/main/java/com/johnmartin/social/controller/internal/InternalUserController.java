@@ -21,31 +21,27 @@ import com.johnmartin.social.utils.ApiErrorUtils;
 
 import jakarta.validation.Valid;
 
+@RestController
+@RequestMapping(ApiConstants.InternalPath.API_USER_INTERNAL)
 public class InternalUserController {
 
-    @RestController
-    @RequestMapping(ApiConstants.InternalPath.API_USER_INTERNAL)
-    public class InternalAuthController {
+    private static final Class<InternalUserController> clazz = InternalUserController.class;
 
-        private final Class<InternalAuthController> clazz = InternalAuthController.class;
+    private final UserService userService;
 
-        private final UserService userService;
+    public InternalUserController(UserService userService) {
+        this.userService = userService;
+    }
 
-        public InternalAuthController(UserService userService) {
-            this.userService = userService;
+    @PostMapping(ApiConstants.InternalPath.CREATE_USER)
+    public ResponseEntity<Result<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
+        Optional<UserEntity> userOpt = userService.createUser(request);
+        if (userOpt.isEmpty()) {
+            return ApiErrorUtils.createBadRequestErrorResponse(ApiErrorMessages.User.USER_CREATION_FAILED);
         }
 
-        @PostMapping(ApiConstants.InternalPath.CREATE_USER)
-        public ResponseEntity<Result<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
-            Optional<UserEntity> userOpt = userService.createUser(request);
-            if (userOpt.isEmpty()) {
-                return ApiErrorUtils.createBadRequestErrorResponse(ApiErrorMessages.User.USER_CREATION_FAILED);
-            }
-
-            UserEntity userEntity = userOpt.get();
-            LoggerUtility.t(clazz, String.format("userEntity: [%s]", userEntity));
-            return ResponseEntity.ok(Result.success(UserMapper.toResponse(userEntity)));
-        }
-
+        UserEntity userEntity = userOpt.get();
+        LoggerUtility.d(clazz, String.format("userEntity: [%s]", userEntity));
+        return ResponseEntity.ok(Result.success(UserMapper.toResponse(userEntity)));
     }
 }
