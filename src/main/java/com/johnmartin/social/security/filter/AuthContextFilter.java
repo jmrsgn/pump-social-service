@@ -25,10 +25,6 @@ public class AuthContextFilter extends BaseFilter {
 
     @Override
     protected void doFilterAction(HttpServletRequest request, HttpServletResponse response) {
-        // IMPORTANT:
-        // Do NOT throw on missing Authorization header.
-        // Health probes and public endpoints rely on this.
-
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String requestId = (String) request.getAttribute(SecurityConstants.REQUEST_ID);
 

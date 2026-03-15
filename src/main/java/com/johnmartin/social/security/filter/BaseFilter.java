@@ -16,6 +16,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 
 public abstract class BaseFilter extends OncePerRequestFilter {
 
@@ -26,9 +27,9 @@ public abstract class BaseFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected final void doFilterInternal(HttpServletRequest request,
-                                          HttpServletResponse response,
-                                          FilterChain filterChain) throws ServletException, IOException {
+    protected final void doFilterInternal(@NonNull HttpServletRequest request,
+                                          @NonNull HttpServletResponse response,
+                                          @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             if (shouldSkip(request)) {
                 filterChain.doFilter(request, response);
