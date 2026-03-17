@@ -6,31 +6,29 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.dto.response.PostResponse;
 import com.johnmartin.social.entities.PostEntity;
 
 public class PostMapper {
-    public static PostResponse toResponse(PostEntity post, List<CommentResponse> comments, String currentUserId) {
-        return new PostResponse(post.getId(),
-                                post.getTitle(),
-                                post.getDescription(),
-                                post.getAuthorId(),
-                                post.getAuthor(),
-                                post.getAuthorProfileImageUrl(),
-                                post.getCreatedAt(),
-                                post.getUpdatedAt(),
-
-                                // Comments are sorted from oldest to newest
-                                CollectionUtils.isEmpty(comments) ? new ArrayList<>()
-                                                                  : comments.stream()
-                                                                            .sorted(Comparator.comparing(CommentResponse::getCreatedAt))
-                                                                            .toList(),
-                                post.getLikesCount(),
-                                post.getCommentsCount(),
-                                post.getSharesCount(),
-                                post.getLikedByUserIds(),
-                                isLikedByCurrentUser(post, currentUserId));
+    public static PostResponse toResponse(PostEntity post, List<CommentResponse> comments, AuthUser authUser) {
+        return new PostResponse().withId(post.getId())
+                                 .withTitle(post.getTitle())
+                                 .withDescription(post.getDescription())
+                                 .withAuthor(authUser.getFirstName() + authUser.getLastName())
+                                 .withAuthorProfileImageUrl(authUser.getProfileImageUrl())
+                                 .withCreatedAt(post.getCreatedAt())
+                                 .withUpdatedAt(post.getUpdatedAt())
+                                 .withComments(CollectionUtils.isEmpty(comments) ? new ArrayList<>()
+                                                                                 : comments.stream()
+                                                                                           .sorted(Comparator.comparing(CommentResponse::getCreatedAt))
+                                                                                           .toList())
+                                 .withLikesCount(post.getLikesCount())
+                                 .withCommentsCount(post.getCommentsCount())
+                                 .withSharesCount(post.getSharesCount())
+                                 .withLikedByUserIds(post.getLikedByUserIds())
+                                 .withLikedByCurrentUser(isLikedByCurrentUser(post, authUser.getId()));
     }
 
     private static boolean isLikedByCurrentUser(PostEntity post, String currentUserId) {

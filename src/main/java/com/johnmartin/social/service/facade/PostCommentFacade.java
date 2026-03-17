@@ -60,7 +60,7 @@ public class PostCommentFacade {
                                                                                         commentService.getComments(post.getId(),
                                                                                                                    authUser.getId(),
                                                                                                                    0),
-                                                                                        authUser.getId()))
+                                                                                        authUser))
                                                      .toList();
     }
 
@@ -84,7 +84,7 @@ public class PostCommentFacade {
         LoggerUtility.d(clazz, String.format("postToBeReturned: [%s]", postToBeReturned));
         return PostMapper.toResponse(postToBeReturned,
                                      commentService.getComments(postToBeReturned.getId(), authUser.getId(), 0),
-                                     authUser.getId());
+                                     authUser);
     }
 
     /**
@@ -117,7 +117,7 @@ public class PostCommentFacade {
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
         return PostMapper.toResponse(updatedPost,
                                      commentService.getComments(updatedPost.getId(), authUser.getId(), 0),
-                                     authUser.getId());
+                                     authUser);
     }
 
     /**
@@ -190,6 +190,6 @@ public class PostCommentFacade {
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
         return PostMapper.toResponse(updatedPost,
                                      commentService.getComments(updatedPost.getId(), authUser.getId(), 0),
-                                     authUser.getId());
+                                     authUser);
     }
 }

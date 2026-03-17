@@ -6,7 +6,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.utils.ApiErrorUtils;
 
 import jakarta.validation.ConstraintViolationException;
@@ -36,7 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
-        return ApiErrorUtils.createInternalServerErrorResponse(ApiErrorMessages.INTERNAL_SERVER_ERROR);
+        return ApiErrorUtils.createInternalServerErrorResponse(ex.getMessage());
     }
 
     /**
