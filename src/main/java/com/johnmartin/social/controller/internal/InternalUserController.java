@@ -37,6 +37,7 @@ public class InternalUserController {
     public ResponseEntity<Result<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
         Optional<UserEntity> userOpt = userService.createUser(request);
         if (userOpt.isEmpty()) {
+            LoggerUtility.d(clazz, "User creation failed");
             return ApiErrorUtils.createBadRequestErrorResponse(ApiErrorMessages.User.USER_CREATION_FAILED);
         }
 

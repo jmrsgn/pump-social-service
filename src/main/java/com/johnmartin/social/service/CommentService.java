@@ -76,7 +76,6 @@ public class CommentService {
         createdComment.setAuthorId(authUser.getId());
         createdComment.setPostId(post.getId());
         createdComment.setAuthor(authUser.getFirstName() + " " + authUser.getLastName());
-        createdComment.setAuthorProfileImageUrl(authUser.getProfileImageUrl());
         createdComment.setLikesCount(0);
         createdComment.setRepliesCount(0);
 

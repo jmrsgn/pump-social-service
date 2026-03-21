@@ -44,8 +44,8 @@ public class PostService {
         }
 
         PostEntity createdPost = new PostEntity();
-        createdPost.setTitle(request.getTitle());
-        createdPost.setDescription(request.getDescription());
+//        createdPost.setTitle(request.getTitle());
+//        createdPost.setDescription(request.getDescription());
         createdPost.setAuthorId(authUser.getId());
         createdPost.setLikesCount(0);
         createdPost.setCommentsCount(0);

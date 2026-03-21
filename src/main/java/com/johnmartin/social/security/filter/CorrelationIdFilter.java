@@ -7,11 +7,14 @@ import org.slf4j.MDC;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.SecurityConstants;
+import com.johnmartin.social.utilities.LoggerUtility;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class CorrelationIdFilter extends BaseFilter {
+
+    private static final Class<CorrelationIdFilter> clazz = CorrelationIdFilter.class;
 
     public CorrelationIdFilter(ObjectMapper objectMapper) {
         super(objectMapper);
@@ -24,6 +27,8 @@ public class CorrelationIdFilter extends BaseFilter {
         if (StringUtils.isBlank(requestId)) {
             requestId = UUID.randomUUID().toString();
         }
+
+        LoggerUtility.d(clazz, "requestId: [%s]");
 
         MDC.put(SecurityConstants.REQUEST_ID, requestId);
         request.setAttribute(SecurityConstants.REQUEST_ID, requestId);

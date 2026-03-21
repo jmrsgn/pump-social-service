@@ -8,6 +8,7 @@ public class ApiErrorMessages {
     public static final String INTERNAL_SERVER_ERROR = "Internal server error";
     public static final String INVALID_REQUEST = "Invalid request";
     public static final String MISSING_AUTH_HEADER = "Missing Authentication Header";
+    public static final String BAD_REQUEST = "Bad request";
 
     public static class User {
         public static final String USER_IS_NOT_AUTHENTICATED = "User is not authenticated";
@@ -22,6 +23,8 @@ public class ApiErrorMessages {
         public static final String FIRST_NAME_IS_REQUIRED = "First name is required";
         public static final String LAST_NAME_IS_REQUIRED = "Last name is required";
         public static final String USER_CREATION_FAILED = "User creation failed";
+        public static final String USER_IS_NOT_AUTHENTICATED_OR_INVALID_TOKEN = USER_IS_NOT_AUTHENTICATED + " or "
+                                                                                + INVALID_TOKEN;
     }
 
     public static class Post {

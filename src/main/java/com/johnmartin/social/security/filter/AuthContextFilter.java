@@ -2,19 +2,25 @@ package com.johnmartin.social.security.filter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.SecurityConstants;
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.api.ApiErrorMessages;
+import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.exception.UnauthorizedException;
 import com.johnmartin.social.security.AuthContext;
 import com.johnmartin.social.service.AuthServiceClient;
+import com.johnmartin.social.utilities.LoggerUtility;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class AuthContextFilter extends BaseFilter {
+
+    private static final Class<AuthContextFilter> clazz = AuthContextFilter.class;
 
     private final AuthServiceClient authService;
 
@@ -32,8 +38,19 @@ public class AuthContextFilter extends BaseFilter {
             throw new UnauthorizedException(ApiErrorMessages.MISSING_AUTH_HEADER);
         }
 
+        LoggerUtility.d(clazz, String.format("requestId: [%s]", requestId));
+
         // Auth details will be handled in AuthService
-        AuthContext.set(authService.validate(authHeader, requestId));
+        AuthUser authUser = authService.validate(authHeader, requestId);
+        LoggerUtility.d(clazz, String.format("authUser: [%s]", authUser));
+        AuthContext.set(authUser);
+
+        // Required! put authUser to Spring Security Context
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser,
+                                                                                                     null,
+                                                                                                     null);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Override

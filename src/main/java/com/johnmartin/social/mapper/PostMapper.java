@@ -17,7 +17,6 @@ public class PostMapper {
                                  .withTitle(post.getTitle())
                                  .withDescription(post.getDescription())
                                  .withAuthor(authUser.getFirstName() + authUser.getLastName())
-                                 .withAuthorProfileImageUrl(authUser.getProfileImageUrl())
                                  .withCreatedAt(post.getCreatedAt())
                                  .withUpdatedAt(post.getUpdatedAt())
                                  .withComments(CollectionUtils.isEmpty(comments) ? new ArrayList<>()

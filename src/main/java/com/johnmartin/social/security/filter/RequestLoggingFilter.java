@@ -16,6 +16,8 @@ import lombok.NonNull;
 @Component
 public class RequestLoggingFilter extends OncePerRequestFilter {
 
+    private static final Class<RequestLoggingFilter> clazz = RequestLoggingFilter.class;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -27,9 +29,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             long duration = System.currentTimeMillis() - start;
-            LoggerUtility.d(RequestLoggingFilter.class,
+            LoggerUtility.d(clazz,
                             request.getMethod() + " " + request.getRequestURI() + " " + response.getStatus() + " ("
-                                                        + duration + "ms)");
+                                   + duration + "ms)");
         }
     }
 }

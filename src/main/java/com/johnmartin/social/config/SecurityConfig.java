@@ -9,6 +9,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.api.ApiConstants;
+import com.johnmartin.social.security.custom.CustomAccessDeniedHandler;
+import com.johnmartin.social.security.custom.CustomAuthEntryPoint;
 import com.johnmartin.social.security.filter.AuthContextFilter;
 import com.johnmartin.social.security.filter.CorrelationIdFilter;
 import com.johnmartin.social.security.filter.RequestLoggingFilter;
@@ -45,11 +47,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    AuthContextFilter authContextFilter,
                                                    CorrelationIdFilter correlationIdFilter,
-                                                   RequestLoggingFilter requestLoggingFilter) throws Exception {
+                                                   RequestLoggingFilter requestLoggingFilter,
+                                                   CustomAuthEntryPoint customAuthEntryPoint,
+                                                   CustomAccessDeniedHandler customAccessDeniedHandler) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .addFilterBefore(correlationIdFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(authContextFilter, CorrelationIdFilter.class)
             .addFilterAfter(requestLoggingFilter, AuthContextFilter.class)
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthEntryPoint)
+                                       .accessDeniedHandler(customAccessDeniedHandler))
             .authorizeHttpRequests(authorize -> authorize.requestMatchers(ApiConstants.Path.ACTUATOR
                                                                           + ApiConstants.Path.HEALTH,
                                                                           ApiConstants.Path.ACTUATOR + ApiConstants.Path.HEALTH
