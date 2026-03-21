@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 public final class LoggerUtility {
 
     private LoggerUtility() {
-        // prevent instantiation
     }
 
     public static Logger getLogger(Class<?> clazz) {

@@ -45,7 +45,7 @@ public class AuthContextFilter extends BaseFilter {
         LoggerUtility.d(clazz, String.format("authUser: [%s]", authUser));
         AuthContext.set(authUser);
 
-        // Required! put authUser to Spring Security Context
+        // REQUIRED: put authUser to Spring Security Context
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser,
                                                                                                      null,
                                                                                                      null);

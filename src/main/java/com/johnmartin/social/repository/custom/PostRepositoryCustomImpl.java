@@ -1,6 +1,5 @@
 package com.johnmartin.social.repository.custom;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,8 +10,11 @@ import com.johnmartin.social.entities.PostEntity;
 
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
+
+    public PostRepositoryCustomImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @Override
     public void incrementCommentsCount(String postId) {

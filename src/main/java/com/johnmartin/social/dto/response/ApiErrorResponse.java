@@ -7,10 +7,4 @@ public record ApiErrorResponse(int status, String error, String message, Instant
     public ApiErrorResponse(int status, String error, String message) {
         this(status, error, message, Instant.now());
     }
-
-    @Override
-    public String toString() {
-        return "ApiErrorResponse{" + "status=" + status + ", error='" + error + '\'' + ", message='" + message + '\''
-               + ", timestamp=" + timestamp + '}';
-    }
 }

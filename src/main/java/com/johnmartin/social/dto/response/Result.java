@@ -8,36 +8,39 @@ import java.util.Optional;
  * @param <T>
  *            Type of the success data
  */
-public class Result<T> {
-    private final T data;
-    private final ApiErrorResponse apiErrorResponse;
+public record Result<T>(T data, ApiErrorResponse apiErrorResponse) {
 
-    private Result(T data, ApiErrorResponse apiErrorResponse) {
-        this.data = data;
-        this.apiErrorResponse = apiErrorResponse;
-    }
-
-    /** Factory method for success */
+    /**
+     * Factory method for success
+     */
     public static <T> Result<T> success(T data) {
         return new Result<>(data, null);
     }
 
-    /** Factory method for failure */
+    /**
+     * Factory method for failure
+     */
     public static <T> Result<T> failure(ApiErrorResponse apiErrorResponse) {
         return new Result<>(null, apiErrorResponse);
     }
 
-    /** Check if result is success */
+    /**
+     * Check if result is success
+     */
     public boolean isSuccess() {
         return data != null && apiErrorResponse == null;
     }
 
-    /** Check if result is failure */
+    /**
+     * Check if result is failure
+     */
     public boolean isFailure() {
         return apiErrorResponse != null;
     }
 
-    /** Get data wrapped in Optional */
+    /**
+     * Get data wrapped in Optional
+     */
     public Optional<T> getData() {
         return Optional.ofNullable(data);
     }

@@ -5,6 +5,9 @@ import com.johnmartin.social.entities.CommentEntity;
 
 public class CommentMapper {
 
+    private CommentMapper() {
+    }
+
     public static CommentResponse toResponse(CommentEntity comment, String currentUserId) {
         return new CommentResponse(comment.getId(),
                                    comment.getComment(),

@@ -7,8 +7,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.request.CreateUserRequest;
 import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.exception.NotFoundException;
 import com.johnmartin.social.repository.UserRepository;
 
 @Service
@@ -24,23 +26,19 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    public Optional<UserEntity> findById(String id) {
-        return userRepository.findById(id);
-    }
-
-    public Optional<UserEntity> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public UserEntity findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                             .orElseThrow(() -> new NotFoundException(ApiErrorMessages.User.USER_NOT_FOUND));
     }
 
     public Optional<UserEntity> createUser(CreateUserRequest request) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setId(request.getId());
-        userEntity.setFirstName(request.getFirstName());
-        userEntity.setLastName(request.getLastName());
-        userEntity.setEmail(request.getEmail());
+        userEntity.setId(request.id());
+        userEntity.setFirstName(request.firstName());
+        userEntity.setLastName(request.lastName());
+        userEntity.setEmail(request.email());
         userEntity.setProfileImageUrl(StringUtils.EMPTY);
         userEntity.setBio(StringUtils.EMPTY);
-
         return Optional.of(userRepository.save(userEntity));
     }
 

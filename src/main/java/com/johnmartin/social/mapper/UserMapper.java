@@ -5,14 +5,17 @@ import com.johnmartin.social.entities.UserEntity;
 
 public class UserMapper {
 
+    private UserMapper() {
+    }
+
     public static UserResponse toResponse(UserEntity userEntity) {
-        return new UserResponse().withId(userEntity.getId())
-                                 .withFirstName(userEntity.getFirstName())
-                                 .withLastName(userEntity.getLastName())
-                                 .withEmail(userEntity.getEmail())
-                                 .withProfileImageUrl(userEntity.getProfileImageUrl())
-                                 .withBio(userEntity.getBio())
-                                 .withFollowersNo(userEntity.getFollowersNo())
-                                 .withFollowingNo(userEntity.getFollowingNo());
+        return new UserResponse(userEntity.getId(),
+                                userEntity.getFirstName(),
+                                userEntity.getLastName(),
+                                userEntity.getEmail(),
+                                userEntity.getProfileImageUrl(),
+                                userEntity.getBio(),
+                                userEntity.getFollowersNo(),
+                                userEntity.getFollowingNo());
     }
 }

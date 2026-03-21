@@ -68,11 +68,9 @@ public abstract class BaseFilter extends OncePerRequestFilter {
     protected void writeUnauthorized(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        ApiErrorResponse error = new ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(),
-                                                      ApiConstants.Error.UNAUTHORIZED,
-                                                      message);
-
-        response.getWriter().write(objectMapper.writeValueAsString(Result.failure(error)));
+        response.getWriter()
+                .write(objectMapper.writeValueAsString(Result.failure(new ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+                                                                                           ApiConstants.Error.UNAUTHORIZED,
+                                                                                           message))));
     }
 }
