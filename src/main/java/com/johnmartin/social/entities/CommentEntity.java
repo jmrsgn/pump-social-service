@@ -22,30 +22,23 @@ public class CommentEntity {
     @Id
     private String id;
     private String comment;
-
     private String authorId;
     private String postId;
-
-    // Store user basic info for faster frontend rendering
-    private String author;
-    private String authorProfileImageUrl;
-
-    @CreatedDate
-    private Instant createdAt;
-    @LastModifiedDate
-    private Instant updatedAt;
 
     private int likesCount;
     private int repliesCount;
 
     private Set<String> likedByUserIds = new HashSet<>();
 
+    @CreatedDate
+    private Instant createdAt;
+    @LastModifiedDate
+    private Instant updatedAt;
+
     @Override
     public String toString() {
         return "CommentEntity{" + "id='" + id + '\'' + ", comment='" + comment + '\'' + ", authorId='" + authorId + '\''
-               + ", postId='" + postId + '\'' + ", author='" + author + '\'' + ", authorProfileImageUrl='"
-               + authorProfileImageUrl + '\'' + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt
-               + ", likesCount=" + likesCount + ", repliesCount=" + repliesCount + ", likedByUserIds=" + likedByUserIds
-               + '}';
+               + ", postId='" + postId + '\'' + ", likesCount=" + likesCount + ", repliesCount=" + repliesCount
+               + ", likedByUserIds=" + likedByUserIds + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
 }

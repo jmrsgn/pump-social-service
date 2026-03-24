@@ -5,14 +5,13 @@ import java.util.Set;
 
 public record CommentResponse(String id,
                               String comment,
-                              String authorId,
                               String postId,
                               String author,
                               String authorProfileImageUrl,
-                              Instant createdAt,
-                              Instant updatedAt,
                               int likesCount,
                               int repliesCount,
+                              Instant createdAt,
+                              Instant updatedAt,
                               Set<String> likedByUserIds,
                               boolean isLikedByCurrentUser) {
 }

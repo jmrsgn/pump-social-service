@@ -73,9 +73,7 @@ public class PostCommentFacade {
 
         // Get comments per posts, then return all posts in a list
         return posts.stream()
-                    .map(post -> PostMapper.toResponse(post,
-                                                       commentService.getComments(post.getId(), user.getId(), 0),
-                                                       user))
+                    .map(post -> PostMapper.toResponse(post, commentService.getComments(post.getId(), user, 0), user))
                     .toList();
     }
 
@@ -106,7 +104,7 @@ public class PostCommentFacade {
         // Get social user
         UserEntity user = userService.findByEmail(authUser.email());
         return PostMapper.toResponse(postToBeReturned,
-                                     commentService.getComments(postToBeReturned.getId(), user.getId(), 0),
+                                     commentService.getComments(postToBeReturned.getId(), user, 0),
                                      user);
     }
 
@@ -146,9 +144,7 @@ public class PostCommentFacade {
         // Get updated post to get updated like state
         PostEntity updatedPost = postService.getPostById(post.getId());
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
-        return PostMapper.toResponse(updatedPost,
-                                     commentService.getComments(updatedPost.getId(), user.getId(), 0),
-                                     user);
+        return PostMapper.toResponse(updatedPost, commentService.getComments(updatedPost.getId(), user, 0), user);
     }
 
     /**
@@ -232,8 +228,6 @@ public class PostCommentFacade {
 
         PostEntity updatedPost = postService.savePost(post);
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
-        return PostMapper.toResponse(updatedPost,
-                                     commentService.getComments(updatedPost.getId(), user.getId(), 0),
-                                     user);
+        return PostMapper.toResponse(updatedPost, commentService.getComments(updatedPost.getId(), user, 0), user);
     }
 }
