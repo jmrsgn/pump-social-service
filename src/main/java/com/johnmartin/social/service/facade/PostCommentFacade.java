@@ -184,14 +184,15 @@ public class PostCommentFacade {
 
         // Only post owner can delete
         if (!post.getAuthorId().equals(user.getId())) {
-            throw new UnauthorizedException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
+            throw new ForbiddenException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
         }
 
         // Delete all comments under the post
-        commentService.deleteByPostId(post.getId());
+        commentService.deleteByPostId(postId);
+        postLikeService.deleteByPostId(postId);
 
         // Delete the post
-        postService.deletePost(post.getId());
+        postService.deletePost(postId);
     }
 
     /**
@@ -225,10 +226,9 @@ public class PostCommentFacade {
         }
 
         PostEntity post = postService.getPostById(postId);
-        UserEntity user = userService.findByEmail(authUser.email());
 
         // Only owner can edit
-        if (!post.getAuthorId().equals(user.getId())) {
+        if (!post.getAuthorId().equals(authUser.id())) {
             throw new UnauthorizedException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
         }
 
@@ -239,6 +239,10 @@ public class PostCommentFacade {
 
         PostEntity updatedPost = postService.savePost(post);
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
-        return PostMapper.toResponse(updatedPost, commentService.getComments(updatedPost.getId(), user, 0), user);
+
+        UserEntity socialUser = userService.findByEmail(authUser.email());
+        List<CommentResponse> comments = commentService.getComments(postId, socialUser, 0);
+        boolean isLiked = postLikeService.isPostLikedByUser(postId, authUser.id());
+        return PostMapper.toResponse(updatedPost, comments, socialUser, isLiked);
     }
 }

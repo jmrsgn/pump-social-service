@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.PostLikeEntity;
 import com.johnmartin.social.repository.PostLikeRepository;
 import com.johnmartin.social.repository.PostRepository;
@@ -58,5 +59,10 @@ public class PostLikeService {
 
     public boolean isPostLikedByUser(String postId, String userId) {
         return postLikeRepository.existsByUserIdAndPostId(userId, postId);
+    }
+
+    public void deleteByPostId(String postId) {
+        LoggerUtility.d(clazz, String.format("Execute method: [deleteByPostId] postId: [%s]", postId));
+        postLikeRepository.deleteByPostId(postLikeRepository);
     }
 }
