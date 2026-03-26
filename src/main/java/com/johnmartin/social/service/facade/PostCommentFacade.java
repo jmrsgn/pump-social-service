@@ -1,8 +1,7 @@
 package com.johnmartin.social.service.facade;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +13,7 @@ import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.UpdatePostRequest;
+import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.dto.response.PostResponse;
 import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.UserEntity;
@@ -22,6 +22,7 @@ import com.johnmartin.social.exception.UnauthorizedException;
 import com.johnmartin.social.mapper.PostMapper;
 import com.johnmartin.social.security.AuthContext;
 import com.johnmartin.social.service.CommentService;
+import com.johnmartin.social.service.PostLikeService;
 import com.johnmartin.social.service.PostService;
 import com.johnmartin.social.service.UserService;
 import com.johnmartin.social.utilities.LoggerUtility;
@@ -35,11 +36,16 @@ public class PostCommentFacade {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final PostLikeService postLikeService;
     private final UserService userService;
 
-    public PostCommentFacade(PostService postService, CommentService commentService, UserService userService) {
+    public PostCommentFacade(PostService postService,
+                             CommentService commentService,
+                             PostLikeService postLikeService,
+                             UserService userService) {
         this.postService = postService;
         this.commentService = commentService;
+        this.postLikeService = postLikeService;
         this.userService = userService;
     }
 
@@ -68,12 +74,19 @@ public class PostCommentFacade {
             return Collections.emptyList();
         }
 
-        // Get social user
-        UserEntity user = userService.findByEmail(authUser.email());
-
-        // Get comments per posts, then return all posts in a list
+        // Extract all posts's id
+        List<String> postIds = posts.stream().map(PostEntity::getId).toList();
+        // Get latest comments by post ids
+        UserEntity socialUser = userService.findByEmail(authUser.email());
+        Map<String, List<CommentResponse>> commentsByPost = commentService.getLatestCommentsByPostIds(postIds,
+                                                                                                      socialUser);
+        // Get likedPostIds
+        Set<String> likedPostIds = postLikeService.getLikedPostIds(socialUser.getId(), postIds);
         return posts.stream()
-                    .map(post -> PostMapper.toResponse(post, commentService.getComments(post.getId(), user, 0), user))
+                    .map(post -> PostMapper.toResponse(post,
+                                                       commentsByPost.getOrDefault(post.getId(), new ArrayList<>()),
+                                                       socialUser,
+                                                       likedPostIds.contains(post.getId())))
                     .toList();
     }
 
@@ -98,14 +111,16 @@ public class PostCommentFacade {
             throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
         }
 
-        PostEntity postToBeReturned = postService.getPostById(postId);
-        LoggerUtility.d(clazz, String.format("postToBeReturned: [%s]", postToBeReturned));
+        PostEntity post = postService.getPostById(postId);
+        LoggerUtility.d(clazz, String.format("post: [%s]", post));
 
-        // Get social user
-        UserEntity user = userService.findByEmail(authUser.email());
-        return PostMapper.toResponse(postToBeReturned,
-                                     commentService.getComments(postToBeReturned.getId(), user, 0),
-                                     user);
+        // Get comments
+        UserEntity socialUser = userService.findByEmail(authUser.email());
+        List<CommentResponse> comments = commentService.getComments(postId, socialUser, 0);
+        LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
+        boolean isLiked = postLikeService.isPostLikedByUser(postId, socialUser.getId());
+
+        return PostMapper.toResponse(post, comments, socialUser, isLiked);
     }
 
     /**
@@ -130,21 +145,17 @@ public class PostCommentFacade {
         }
 
         PostEntity post = postService.getPostById(postId);
-
-        // Get social user
-        UserEntity user = userService.findByEmail(authUser.email());
-
-        // If user already liked the post, unlike
-        if (CollectionUtils.containsAny(post.getLikedByUserIds(), user.getId())) {
-            postService.unlikePost(user.getId(), post.getId());
-        } else {
-            postService.likePost(user.getId(), post.getId());
-        }
-
-        // Get updated post to get updated like state
+        // toggleLike updates the post' counters
+        boolean isLiked = postLikeService.toggleLike(post.getId(), authUser.id());
+        // Fetch updated post with updated counters
         PostEntity updatedPost = postService.getPostById(post.getId());
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
-        return PostMapper.toResponse(updatedPost, commentService.getComments(updatedPost.getId(), user, 0), user);
+
+        UserEntity socialUser = userService.findByEmail(authUser.email());
+        List<CommentResponse> comments = commentService.getComments(updatedPost.getId(), socialUser, 0);
+        LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
+        // Get social user
+        return PostMapper.toResponse(updatedPost, comments, socialUser, isLiked);
     }
 
     /**

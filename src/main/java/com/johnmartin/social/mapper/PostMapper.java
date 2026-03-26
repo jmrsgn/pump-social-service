@@ -16,12 +16,17 @@ public class PostMapper {
     private PostMapper() {
     }
 
-    public static PostResponse toResponse(PostEntity post, List<CommentResponse> comments, UserEntity socialUser) {
+    public static PostResponse toResponse(PostEntity post,
+                                          List<CommentResponse> comments,
+                                          UserEntity socialUser,
+                                          boolean isLikedByCurrentUser) {
         return new PostResponse(post.getId(),
                                 post.getTitle(),
                                 post.getDescription(),
                                 socialUser.getFirstName() + " " + socialUser.getLastName(),
                                 socialUser.getProfileImageUrl(),
+                                post.getMediaUrl(),
+                                post.getMediaType() == null ? null : post.getMediaType().name(),
                                 post.getLikesCount(),
                                 post.getCommentsCount(),
                                 post.getSharesCount(),
@@ -31,11 +36,6 @@ public class PostMapper {
                                                                             .toList(),
                                 post.getCreatedAt(),
                                 post.getUpdatedAt(),
-                                post.getLikedByUserIds(),
-                                isLikedByCurrentUser(post, socialUser.getId()));
-    }
-
-    private static boolean isLikedByCurrentUser(PostEntity post, String currentUserId) {
-        return post.getLikedByUserIds() != null && post.getLikedByUserIds().contains(currentUserId);
+                                isLikedByCurrentUser);
     }
 }

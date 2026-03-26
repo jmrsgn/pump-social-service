@@ -1,6 +1,8 @@
 package com.johnmartin.social.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,16 +51,16 @@ public class CommentService {
      *            - page
      * @return List of CommentResponse
      */
-    public List<CommentResponse> getComments(String postId, UserEntity user, int page) {
+    public List<CommentResponse> getComments(String postId, UserEntity socialUser, int page) {
         LoggerUtility.d(clazz,
-                        String.format("Execute method: [getComments] postId: [%s] user: [%s] page: [%s]",
+                        String.format("Execute method: [getComments] postId: [%s] socialUser: [%s] page: [%s]",
                                       postId,
-                                      user,
+                                      socialUser,
                                       page));
 
         PageRequest pageRequest = PageRequest.of(page, UIConstants.MINIMUM_COMMENTS_PER_POST);
         List<CommentEntity> commentEntityList = commentRepository.findByPostIdOrderByCreatedAtDesc(postId, pageRequest);
-        return commentEntityList.stream().map(comment -> CommentMapper.toResponse(comment, user)).toList();
+        return commentEntityList.stream().map(comment -> CommentMapper.toResponse(comment, socialUser)).toList();
     }
 
     /**
@@ -271,5 +273,14 @@ public class CommentService {
                                       userId,
                                       commentId));
         commentRepository.unlikeComment(userId, commentId);
+    }
+
+    public Map<String, List<CommentResponse>> getLatestCommentsByPostIds(List<String> postIds, UserEntity socialUser) {
+        LoggerUtility.d(clazz, "Execute method: [getLatestCommentsByPostIds]");
+        List<CommentEntity> comments = commentRepository.findByPostIdInOrderByCreatedAtDesc(postIds);
+
+        return comments.stream()
+                       .map(comment -> CommentMapper.toResponse(comment, socialUser))
+                       .collect(Collectors.groupingBy(CommentResponse::postId));
     }
 }

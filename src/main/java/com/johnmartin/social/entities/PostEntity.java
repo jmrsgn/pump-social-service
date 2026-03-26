@@ -1,8 +1,6 @@
 package com.johnmartin.social.entities;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -25,14 +23,13 @@ public class PostEntity {
     private String authorId;
     private String title;
     private String description;
+
     private String mediaUrl;
     private MediaType mediaType;
 
     private int likesCount;
     private int commentsCount;
     private int sharesCount;
-
-    private Set<String> likedByUserIds = new HashSet<>();
 
     @CreatedDate
     private Instant createdAt;

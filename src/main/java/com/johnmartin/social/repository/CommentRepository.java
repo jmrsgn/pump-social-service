@@ -20,4 +20,8 @@ public interface CommentRepository extends MongoRepository<CommentEntity, String
                                                                              Pageable pageable);
 
     void deleteByPostId(String postId);
+
+    List<CommentEntity> findByPostIdOrderByCreatedAtDesc(String postId);
+
+    List<CommentEntity> findByPostIdInOrderByCreatedAtDesc(List<String> postIds);
 }

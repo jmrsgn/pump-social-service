@@ -6,7 +6,7 @@ public interface PostRepositoryCustom {
 
     void decrementCommentsCount(String postId);
 
-    void likePost(String userId, String postId);
+    void incrementLikesCount(String postId);
 
-    void unlikePost(String userId, String postId);
+    void decrementLikesCount(String postId);
 }

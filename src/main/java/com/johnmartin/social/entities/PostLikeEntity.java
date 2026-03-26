@@ -1,0 +1,26 @@
+package com.johnmartin.social.entities;
+
+import java.time.Instant;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.johnmartin.social.constants.entities.PostEntityConstants;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Document(collection = PostEntityConstants.PostLike.TABLE_NAME)
+public class PostLikeEntity {
+
+    @Id
+    private String id;
+
+    private String userId;
+    private String postId;
+
+    private Instant createdAt;
+    private Instant updatedAt;
+}

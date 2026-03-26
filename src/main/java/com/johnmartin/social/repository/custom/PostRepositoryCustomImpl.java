@@ -29,16 +29,14 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public void likePost(String userId, String postId) {
-        Update update = new Update().addToSet(PostEntityConstants.COLUMN_LIKED_BY_USER_IDS, userId)
-                                    .inc(PostEntityConstants.COLUMN_LIKES_COUNT, 1);
+    public void incrementLikesCount(String postId) {
+        Update update = new Update().inc(PostEntityConstants.COLUMN_LIKES_COUNT, 1);
         mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(postId)), update, PostEntity.class);
     }
 
     @Override
-    public void unlikePost(String userId, String postId) {
-        Update update = new Update().pull(PostEntityConstants.COLUMN_LIKED_BY_USER_IDS, userId)
-                                    .inc(PostEntityConstants.COLUMN_LIKES_COUNT, -1);
+    public void decrementLikesCount(String postId) {
+        Update update = new Update().inc(PostEntityConstants.COLUMN_LIKES_COUNT, -1);
         mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(postId)), update, PostEntity.class);
     }
 }
