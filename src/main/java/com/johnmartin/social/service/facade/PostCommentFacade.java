@@ -81,7 +81,7 @@ public class PostCommentFacade {
         Map<String, List<CommentResponse>> commentsByPost = commentService.getLatestCommentsByPostIds(postIds,
                                                                                                       socialUser);
         // Get likedPostIds
-        Set<String> likedPostIds = postLikeService.getLikedPostIds(socialUser.getId(), postIds);
+        Set<String> likedPostIds = postLikeService.getLikedPostIds(postIds, socialUser.getId());
         return posts.stream()
                     .map(post -> PostMapper.toResponse(post,
                                                        commentsByPost.getOrDefault(post.getId(), new ArrayList<>()),
@@ -146,7 +146,6 @@ public class PostCommentFacade {
 
         PostEntity post = postService.getPostById(postId);
         // toggleLike updates the post' counters
-        boolean isLiked = postLikeService.toggleLike(post.getId(), authUser.id());
         // Fetch updated post with updated counters
         PostEntity updatedPost = postService.getPostById(post.getId());
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
@@ -154,7 +153,8 @@ public class PostCommentFacade {
         UserEntity socialUser = userService.findByEmail(authUser.email());
         List<CommentResponse> comments = commentService.getComments(updatedPost.getId(), socialUser, 0);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
-        // Get social user
+
+        boolean isLiked = postLikeService.toggleLike(post.getId(), authUser.id());
         return PostMapper.toResponse(updatedPost, comments, socialUser, isLiked);
     }
 
@@ -184,15 +184,22 @@ public class PostCommentFacade {
 
         // Only post owner can delete
         if (!post.getAuthorId().equals(user.getId())) {
-            throw new ForbiddenException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
+            throw new UnauthorizedException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
         }
 
-        // Delete all comments under the post
-        commentService.deleteByPostId(postId);
-        postLikeService.deleteByPostId(postId);
+        try {
+            // Delete all comments under the post
+            commentService.deleteByPostId(postId);
 
-        // Delete the post
-        postService.deletePost(postId);
+            // Delete likes for posts
+            postLikeService.deleteByPostId(postId);
+
+            // Delete the post
+            postService.deletePost(postId);
+        } catch (Exception e) {
+            LoggerUtility.e(clazz, String.format("Failed to delete post. error: [%s]", e.getMessage()), e);
+        }
+
     }
 
     /**
@@ -237,11 +244,13 @@ public class PostCommentFacade {
         post.setDescription(request.description());
         post.setUpdatedAt(Instant.now());
 
+        UserEntity socialUser = userService.findByEmail(authUser.email());
+        List<CommentResponse> comments = commentService.getComments(postId, socialUser, 0);
+        LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
+
         PostEntity updatedPost = postService.savePost(post);
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
 
-        UserEntity socialUser = userService.findByEmail(authUser.email());
-        List<CommentResponse> comments = commentService.getComments(postId, socialUser, 0);
         boolean isLiked = postLikeService.isPostLikedByUser(postId, authUser.id());
         return PostMapper.toResponse(updatedPost, comments, socialUser, isLiked);
     }

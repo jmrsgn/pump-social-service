@@ -22,16 +22,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void save(UserEntity userEntity) {
-        userRepository.save(userEntity);
-    }
-
     public UserEntity findByEmail(String email) {
         return userRepository.findByEmail(email)
                              .orElseThrow(() -> new NotFoundException(ApiErrorMessages.User.USER_NOT_FOUND));
     }
 
-    public Optional<UserEntity> createUser(CreateUserRequest request) {
+    public UserEntity createUser(CreateUserRequest request) {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(request.id());
         userEntity.setFirstName(request.firstName());
@@ -39,7 +35,7 @@ public class UserService {
         userEntity.setEmail(request.email());
         userEntity.setProfileImageUrl(StringUtils.EMPTY);
         userEntity.setBio(StringUtils.EMPTY);
-        return Optional.of(userRepository.save(userEntity));
+        return userRepository.save(userEntity);
     }
 
     public Optional<UserEntity> getAuthenticatedUser() {

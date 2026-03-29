@@ -2,6 +2,10 @@ spring:
   application:
     name: pump-social-service
 
+  data:
+    mongodb:
+      auto-index-creation: true
+
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] %-5level [%thread] %logger{36} - %msg%n"

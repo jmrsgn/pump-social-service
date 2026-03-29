@@ -8,7 +8,7 @@ import java.util.Optional;
  * @param <T>
  *            Type of the success data
  */
-public record Result<T>(T data, ApiErrorResponse apiErrorResponse) {
+public record Result<T>(T data, ApiErrorResponse error) {
 
     /**
      * Factory method for success
@@ -25,20 +25,6 @@ public record Result<T>(T data, ApiErrorResponse apiErrorResponse) {
     }
 
     /**
-     * Check if result is success
-     */
-    public boolean isSuccess() {
-        return data != null && apiErrorResponse == null;
-    }
-
-    /**
-     * Check if result is failure
-     */
-    public boolean isFailure() {
-        return apiErrorResponse != null;
-    }
-
-    /**
      * Get data wrapped in Optional
      */
     public Optional<T> getData() {
@@ -46,6 +32,6 @@ public record Result<T>(T data, ApiErrorResponse apiErrorResponse) {
     }
 
     public ApiErrorResponse getError() {
-        return apiErrorResponse;
+        return error;
     }
 }

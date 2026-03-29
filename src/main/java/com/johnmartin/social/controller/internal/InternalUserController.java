@@ -1,7 +1,5 @@
 package com.johnmartin.social.controller.internal;
 
-import java.util.Optional;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,14 +33,13 @@ public class InternalUserController {
 
     @PostMapping(ApiConstants.InternalPath.CREATE_USER)
     public ResponseEntity<Result<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
-        Optional<UserEntity> userOpt = userService.createUser(request);
-        if (userOpt.isEmpty()) {
+        UserEntity socialUser = userService.createUser(request);
+        if (socialUser == null) {
             LoggerUtility.d(clazz, "User creation failed");
             return ApiErrorUtils.createBadRequestErrorResponse(ApiErrorMessages.User.USER_CREATION_FAILED);
         }
 
-        UserEntity userEntity = userOpt.get();
-        LoggerUtility.d(clazz, String.format("userEntity: [%s]", userEntity));
-        return ResponseEntity.ok(Result.success(UserMapper.toResponse(userEntity)));
+        LoggerUtility.d(clazz, String.format("socialUser: [%s]", socialUser));
+        return ResponseEntity.ok(Result.success(UserMapper.toResponse(socialUser)));
     }
 }

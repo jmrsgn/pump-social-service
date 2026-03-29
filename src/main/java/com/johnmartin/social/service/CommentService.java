@@ -226,8 +226,7 @@ public class CommentService {
      */
     public void deleteByPostId(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [deleteByPostId] postId: [%s]", postId));
-        PostEntity post = postService.getPostById(postId);
-        commentRepository.deleteByPostId(post.getId());
+        commentRepository.deleteByPostId(postId);
     }
 
     /**
@@ -276,9 +275,13 @@ public class CommentService {
     }
 
     public Map<String, List<CommentResponse>> getLatestCommentsByPostIds(List<String> postIds, UserEntity socialUser) {
-        LoggerUtility.d(clazz, "Execute method: [getLatestCommentsByPostIds]");
-        List<CommentEntity> comments = commentRepository.findByPostIdInOrderByCreatedAtDesc(postIds);
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [getLatestCommentsByPostIds] postIds: [%s] socialUser: [%s]",
+                                      postIds,
+                                      socialUser));
 
+        List<CommentEntity> comments = commentRepository.findByPostIdInOrderByCreatedAtDesc(postIds);
+        LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
         return comments.stream()
                        .map(comment -> CommentMapper.toResponse(comment, socialUser))
                        .collect(Collectors.groupingBy(CommentResponse::postId));

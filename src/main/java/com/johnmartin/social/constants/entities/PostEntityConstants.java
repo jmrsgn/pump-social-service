@@ -12,5 +12,8 @@ public class PostEntityConstants {
 
     public static class PostLike {
         public static final String TABLE_NAME = "posts_like";
+
+        public static final String USER_POST_UNIQUE_INDEX = "user_post_unique";
+        public static final String USER_POST_UNIQUE_DEF = "{'userId': 1, 'postId': 1}";
     }
 }

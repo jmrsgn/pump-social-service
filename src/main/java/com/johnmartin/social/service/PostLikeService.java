@@ -7,12 +7,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.PostLikeEntity;
 import com.johnmartin.social.repository.PostLikeRepository;
 import com.johnmartin.social.repository.PostRepository;
 import com.johnmartin.social.utilities.LoggerUtility;
-import com.mongodb.DuplicateKeyException;
 
 import jakarta.transaction.Transactional;
 
@@ -29,28 +27,43 @@ public class PostLikeService {
         this.postRepository = postRepository;
     }
 
+    /**
+     * Store entity that indicates a liked post, catch exception if has duplicate
+     * 
+     * @param postId
+     *            - Post ID
+     * @param userId
+     *            - User ID
+     * @return boolean
+     */
     @Transactional
     public boolean toggleLike(String postId, String userId) {
         LoggerUtility.d(clazz, String.format("Execute method: [toggleLike] postId: [%s] userId: [%s]", postId, userId));
-        try {
-            PostLikeEntity like = new PostLikeEntity();
-            like.setPostId(postId);
-            like.setUserId(userId);
-            like.setCreatedAt(Instant.now());
 
-            postLikeRepository.save(like);
-            postRepository.incrementLikesCount(postId);
-            return true; // liked
-        } catch (DuplicateKeyException ex) {
+        boolean alreadyLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+
+        if (alreadyLiked) {
             postLikeRepository.deleteByUserIdAndPostId(userId, postId);
             postRepository.decrementLikesCount(postId);
             return false; // unliked
         }
+
+        PostLikeEntity like = new PostLikeEntity();
+        like.setPostId(postId);
+        like.setUserId(userId);
+        like.setCreatedAt(Instant.now());
+
+        postLikeRepository.save(like);
+        postRepository.incrementLikesCount(postId);
+
+        return true; // liked
     }
 
-    public Set<String> getLikedPostIds(String userId, List<String> postIds) {
+    public Set<String> getLikedPostIds(List<String> postIds, String userId) {
         LoggerUtility.d(clazz,
-                        String.format("Execute method: [getLikedPostIds] userId: [%s] postIds: [%s]", userId, postIds));
+                        String.format("Execute method: [getLikedPostIds]  postIds: [%s] userId: [%s]",
+                                      postIds,
+                                      userId));
         return postLikeRepository.findByUserIdAndPostIdIn(userId, postIds)
                                  .stream()
                                  .map(PostLikeEntity::getPostId)
@@ -58,11 +71,13 @@ public class PostLikeService {
     }
 
     public boolean isPostLikedByUser(String postId, String userId) {
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [isPostLikedByUser] postId: [%s] userId: [%s]", postId, userId));
         return postLikeRepository.existsByUserIdAndPostId(userId, postId);
     }
 
     public void deleteByPostId(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [deleteByPostId] postId: [%s]", postId));
-        postLikeRepository.deleteByPostId(postLikeRepository);
+        postLikeRepository.deleteByPostId(postId);
     }
 }
