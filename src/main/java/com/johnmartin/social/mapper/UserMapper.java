@@ -15,7 +15,7 @@ public class UserMapper {
                                 userEntity.getEmail(),
                                 userEntity.getProfileImageUrl(),
                                 userEntity.getBio(),
-                                userEntity.getFollowersNo(),
-                                userEntity.getFollowingNo());
+                                userEntity.getFollowersCount(),
+                                userEntity.getFollowingCount());
     }
 }

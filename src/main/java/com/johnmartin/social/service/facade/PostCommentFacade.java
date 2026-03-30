@@ -1,6 +1,5 @@
 package com.johnmartin.social.service.facade;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -246,7 +245,6 @@ public class PostCommentFacade {
         // Update allowed fields only
         post.setTitle(request.title());
         post.setDescription(request.description());
-        post.setUpdatedAt(Instant.now());
 
         // Get social user
         UserEntity socialUser = userService.findByEmail(authUser.email());

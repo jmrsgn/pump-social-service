@@ -3,27 +3,27 @@ package com.johnmartin.social.entities;
 import java.time.Instant;
 
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.johnmartin.social.constants.entities.CommentEntityConstants;
+import com.johnmartin.social.constants.entities.UserEntityConstants;
 
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Document(collection = CommentEntityConstants.CommentLike.TABLE_NAME)
-@CompoundIndex(name = CommentEntityConstants.CommentLike.USER_COMMENT_UNIQUE_INDEX, def = CommentEntityConstants.CommentLike.USER_COMMENT_UNIQUE_DEF, unique = true)
-public class CommentLikeEntity {
+@Document(collection = UserEntityConstants.UserFollow.TABLE_NAME)
+@CompoundIndex(name = UserEntityConstants.UserFollow.USER_FOLLOW_UNIQUE_INDEX, def = UserEntityConstants.UserFollow.USER_FOLLOW_UNIQUE_DEF, unique = true)
+public class UserFollowEntity {
 
     @Id
     private String id;
 
-    private String userId;
-    private String commentId;
+    private String followerId;
+    private String followingId;
 
     @CreatedDate
     private Instant createdAt;

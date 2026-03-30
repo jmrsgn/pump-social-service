@@ -1,6 +1,5 @@
 package com.johnmartin.social.service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +41,6 @@ public class CommentLikeService {
         CommentLikeEntity like = new CommentLikeEntity();
         like.setCommentId(commentId);
         like.setUserId(userId);
-        like.setCreatedAt(Instant.now());
 
         commentLikeRepository.save(like);
         commentRepository.incrementLikesCount(commentId);

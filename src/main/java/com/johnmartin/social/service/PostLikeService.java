@@ -51,7 +51,6 @@ public class PostLikeService {
         PostLikeEntity like = new PostLikeEntity();
         like.setPostId(postId);
         like.setUserId(userId);
-        like.setCreatedAt(Instant.now());
 
         postLikeRepository.save(like);
         postRepository.incrementLikesCount(postId);

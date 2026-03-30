@@ -9,12 +9,16 @@ import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.request.CreateUserRequest;
+import com.johnmartin.social.dto.response.UserResponse;
 import com.johnmartin.social.entities.UserEntity;
 import com.johnmartin.social.exception.NotFoundException;
 import com.johnmartin.social.repository.UserRepository;
+import com.johnmartin.social.utilities.LoggerUtility;
 
 @Service
 public class UserService {
+
+    private static final Class<UserService> clazz = UserService.class;
 
     private final UserRepository userRepository;
 
@@ -23,11 +27,13 @@ public class UserService {
     }
 
     public UserEntity findByEmail(String email) {
+        LoggerUtility.d(clazz, "Execute method: [findByEmail]");
         return userRepository.findByEmail(email)
                              .orElseThrow(() -> new NotFoundException(ApiErrorMessages.User.USER_NOT_FOUND));
     }
 
     public UserEntity createUser(CreateUserRequest request) {
+        LoggerUtility.d(clazz, "Execute method: [createUser]");
         UserEntity userEntity = new UserEntity();
         userEntity.setId(request.id());
         userEntity.setFirstName(request.firstName());
@@ -45,5 +51,10 @@ public class UserService {
         }
         // Registered as subject for Auth, is email
         return userRepository.findByEmail(auth.getName());
+    }
+
+    public UserResponse followUser() {
+        // TODO: continue
+        return null;
     }
 }
