@@ -17,16 +17,14 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
     }
 
     @Override
-    public void likeComment(String userId, String commentId) {
-        Update update = new Update().addToSet(CommentEntityConstants.COLUMN_LIKED_BY_USER_IDS, userId)
-                                    .inc(CommentEntityConstants.COLUMN_LIKES_COUNT, 1);
+    public void incrementLikesCount(String commentId) {
+        Update update = new Update().inc(CommentEntityConstants.COLUMN_LIKES_COUNT, 1);
         mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(commentId)), update, CommentEntity.class);
     }
 
     @Override
-    public void unlikeComment(String userId, String commentId) {
-        Update update = new Update().pull(CommentEntityConstants.COLUMN_LIKED_BY_USER_IDS, userId)
-                                    .inc(CommentEntityConstants.COLUMN_LIKES_COUNT, -1);
+    public void decrementLikesCount(String commentId) {
+        Update update = new Update().inc(CommentEntityConstants.COLUMN_LIKES_COUNT, -1);
         mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(commentId)), update, CommentEntity.class);
     }
 }

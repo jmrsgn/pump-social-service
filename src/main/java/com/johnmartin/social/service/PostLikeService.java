@@ -40,7 +40,7 @@ public class PostLikeService {
     public boolean toggleLike(String postId, String userId) {
         LoggerUtility.d(clazz, String.format("Execute method: [toggleLike] postId: [%s] userId: [%s]", postId, userId));
 
-        boolean alreadyLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean alreadyLiked = isPostLikedByUser(postId, userId);
 
         if (alreadyLiked) {
             postLikeRepository.deleteByUserIdAndPostId(userId, postId);

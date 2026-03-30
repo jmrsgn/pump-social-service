@@ -1,7 +1,10 @@
 package com.johnmartin.social.service.facade;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,7 +87,8 @@ public class PostCommentFacade {
         Set<String> likedPostIds = postLikeService.getLikedPostIds(postIds, socialUser.getId());
         return posts.stream()
                     .map(post -> PostMapper.toResponse(post,
-                                                       commentsByPost.getOrDefault(post.getId(), new ArrayList<>()),
+                                                       commentsByPost.getOrDefault(post.getId(),
+                                                                                   Collections.emptyList()),
                                                        socialUser,
                                                        likedPostIds.contains(post.getId())))
                     .toList();
@@ -116,11 +120,14 @@ public class PostCommentFacade {
 
         // Get comments
         UserEntity socialUser = userService.findByEmail(authUser.email());
-        List<CommentResponse> comments = commentService.getComments(postId, socialUser, 0);
+        Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
+                                                                                                socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
         boolean isLiked = postLikeService.isPostLikedByUser(postId, socialUser.getId());
-
-        return PostMapper.toResponse(post, comments, socialUser, isLiked);
+        return PostMapper.toResponse(post,
+                                     comments.getOrDefault(post.getId(), Collections.emptyList()),
+                                     socialUser,
+                                     isLiked);
     }
 
     /**
@@ -145,17 +152,15 @@ public class PostCommentFacade {
         }
 
         PostEntity post = postService.getPostById(postId);
-        // toggleLike updates the post' counters
-        // Fetch updated post with updated counters
-        PostEntity updatedPost = postService.getPostById(post.getId());
-        LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
+        LoggerUtility.t(clazz, String.format("post: [%s]", post));
 
         UserEntity socialUser = userService.findByEmail(authUser.email());
-        List<CommentResponse> comments = commentService.getComments(updatedPost.getId(), socialUser, 0);
+        Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
+                                                                                                socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
         boolean isLiked = postLikeService.toggleLike(post.getId(), authUser.id());
-        return PostMapper.toResponse(updatedPost, comments, socialUser, isLiked);
+        return PostMapper.toResponse(post, comments.getOrDefault(postId, Collections.emptyList()), socialUser, isLiked);
     }
 
     /**
@@ -199,7 +204,6 @@ public class PostCommentFacade {
         } catch (Exception e) {
             LoggerUtility.e(clazz, String.format("Failed to delete post. error: [%s]", e.getMessage()), e);
         }
-
     }
 
     /**
@@ -244,14 +248,19 @@ public class PostCommentFacade {
         post.setDescription(request.description());
         post.setUpdatedAt(Instant.now());
 
+        // Get social user
         UserEntity socialUser = userService.findByEmail(authUser.email());
-        List<CommentResponse> comments = commentService.getComments(postId, socialUser, 0);
+        Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
+                                                                                                socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
         PostEntity updatedPost = postService.savePost(post);
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
 
         boolean isLiked = postLikeService.isPostLikedByUser(postId, authUser.id());
-        return PostMapper.toResponse(updatedPost, comments, socialUser, isLiked);
+        return PostMapper.toResponse(updatedPost,
+                                     comments.getOrDefault(postId, Collections.emptyList()),
+                                     socialUser,
+                                     isLiked);
     }
 }

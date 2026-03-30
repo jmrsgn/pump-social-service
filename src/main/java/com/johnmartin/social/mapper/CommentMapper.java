@@ -9,7 +9,9 @@ public class CommentMapper {
     private CommentMapper() {
     }
 
-    public static CommentResponse toResponse(CommentEntity comment, UserEntity socialUser) {
+    public static CommentResponse toResponse(CommentEntity comment,
+                                             UserEntity socialUser,
+                                             boolean isLikedByCurrentUser) {
         return new CommentResponse(comment.getId(),
                                    comment.getComment(),
                                    comment.getPostId(),
@@ -19,11 +21,6 @@ public class CommentMapper {
                                    comment.getRepliesCount(),
                                    comment.getCreatedAt(),
                                    comment.getUpdatedAt(),
-                                   comment.getLikedByUserIds(),
-                                   isLikedByCurrentUser(comment, socialUser.getId()));
-    }
-
-    private static boolean isLikedByCurrentUser(CommentEntity comment, String currentUserId) {
-        return comment.getLikedByUserIds() != null && comment.getLikedByUserIds().contains(currentUserId);
+                                   isLikedByCurrentUser);
     }
 }

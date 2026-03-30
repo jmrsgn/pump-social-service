@@ -1,6 +1,6 @@
 package com.johnmartin.social.mapper;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class PostMapper {
                                 post.getLikesCount(),
                                 post.getCommentsCount(),
                                 post.getSharesCount(),
-                                CollectionUtils.isEmpty(comments) ? new ArrayList<>()
+                                CollectionUtils.isEmpty(comments) ? Collections.emptyList()
                                                                   : comments.stream()
                                                                             .sorted(Comparator.comparing(CommentResponse::createdAt))
                                                                             .toList(),

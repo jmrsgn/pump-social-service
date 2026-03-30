@@ -1,8 +1,6 @@
 package com.johnmartin.social.entities;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -28,8 +26,6 @@ public class CommentEntity {
     private int likesCount;
     private int repliesCount;
 
-    private Set<String> likedByUserIds = new HashSet<>();
-
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
@@ -39,6 +35,6 @@ public class CommentEntity {
     public String toString() {
         return "CommentEntity{" + "id='" + id + '\'' + ", comment='" + comment + '\'' + ", authorId='" + authorId + '\''
                + ", postId='" + postId + '\'' + ", likesCount=" + likesCount + ", repliesCount=" + repliesCount
-               + ", likedByUserIds=" + likedByUserIds + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+               + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
 }

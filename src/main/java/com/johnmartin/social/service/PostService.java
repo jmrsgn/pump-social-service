@@ -85,8 +85,7 @@ public class PostService {
      */
     public void incrementCommentsCount(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [incrementCommentsCount] postId: [%s]", postId));
-        PostEntity post = getPostById(postId);
-        postRepository.incrementCommentsCount(post.getId());
+        postRepository.incrementCommentsCount(postId);
     }
 
     /**
@@ -97,8 +96,7 @@ public class PostService {
      */
     public void decrementCommentsCount(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [decrementCommentsCount] postId: [%s]", postId));
-        PostEntity post = getPostById(postId);
-        postRepository.decrementCommentsCount(post.getId());
+        postRepository.decrementCommentsCount(postId);
     }
 
     /**
