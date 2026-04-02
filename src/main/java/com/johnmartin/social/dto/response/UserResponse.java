@@ -7,5 +7,6 @@ public record UserResponse(String id,
                            String profileImageUrl,
                            String bio,
                            long followersNo,
-                           long followingNo) {
+                           long followingNo,
+                           boolean isFollowing) {
 }

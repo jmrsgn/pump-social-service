@@ -1,6 +1,5 @@
 package com.johnmartin.social.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +19,14 @@ import jakarta.validation.constraints.NotBlank;
 @RequestMapping(ApiConstants.Path.API_COMMENT)
 public class CommentController {
 
-    @Autowired
-    private CommentService commentService;
+    private final CommentService commentService;
+
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     @PostMapping
-    public ResponseEntity<Result<CommentResponse>> createComment(@PathVariable(ApiConstants.Params.POST_ID) String postId,
+    public ResponseEntity<Result<CommentResponse>> createComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = ApiErrorMessages.Post.POST_ID_IS_REQUIRED) String postId,
                                                                  @Valid @RequestBody CreateCommentRequest createCommentRequest) {
         CommentResponse createdComment = commentService.createComment(postId, createCommentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(createdComment));

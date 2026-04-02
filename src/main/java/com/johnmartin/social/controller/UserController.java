@@ -1,10 +1,8 @@
 package com.johnmartin.social.controller;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,30 +10,23 @@ import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.response.Result;
 import com.johnmartin.social.dto.response.UserResponse;
-import com.johnmartin.social.entities.UserEntity;
-import com.johnmartin.social.mapper.UserMapper;
 import com.johnmartin.social.service.UserService;
-import com.johnmartin.social.utilities.LoggerUtility;
-import com.johnmartin.social.utils.ApiErrorUtils;
+
+import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping(ApiConstants.Path.API_USER)
 public class UserController {
 
-    private static final Class<UserController> clazz = UserController.class;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    @GetMapping(ApiConstants.Path.PROFILE)
-    public ResponseEntity<Result<UserResponse>> getCurrentUser() {
-        Optional<UserEntity> userOpt = userService.getAuthenticatedUser();
-        if (userOpt.isEmpty()) {
-            return ApiErrorUtils.createUnauthorizedErrorResponse(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
-
-        UserEntity userEntity = userOpt.get();
-        LoggerUtility.t(clazz, String.format("userEntity: [%s]", userEntity));
-        return ResponseEntity.ok(Result.success(UserMapper.toResponse(userEntity)));
+    @PostMapping(ApiConstants.Path.FOLLOW)
+    public ResponseEntity<Result<UserResponse>> followUser(@PathVariable(ApiConstants.Params.USER_ID) @NotBlank(message = ApiErrorMessages.User.USER_ID_IS_REQUIRED) String userId) {
+        UserResponse followedUser = userService.followUser(userId);
+        return ResponseEntity.ok(Result.success(followedUser));
     }
 }

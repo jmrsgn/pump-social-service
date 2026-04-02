@@ -8,7 +8,7 @@ public class UserMapper {
     private UserMapper() {
     }
 
-    public static UserResponse toResponse(UserEntity userEntity) {
+    public static UserResponse toResponse(UserEntity userEntity, boolean isFollowing) {
         return new UserResponse(userEntity.getId(),
                                 userEntity.getFirstName(),
                                 userEntity.getLastName(),
@@ -16,6 +16,7 @@ public class UserMapper {
                                 userEntity.getProfileImageUrl(),
                                 userEntity.getBio(),
                                 userEntity.getFollowersCount(),
-                                userEntity.getFollowingCount());
+                                userEntity.getFollowingCount(),
+                                isFollowing);
     }
 }

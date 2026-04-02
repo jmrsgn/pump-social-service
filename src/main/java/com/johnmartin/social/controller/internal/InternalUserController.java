@@ -40,6 +40,6 @@ public class InternalUserController {
         }
 
         LoggerUtility.d(clazz, String.format("socialUser: [%s]", socialUser));
-        return ResponseEntity.ok(Result.success(UserMapper.toResponse(socialUser)));
+        return ResponseEntity.ok(Result.success(UserMapper.toResponse(socialUser, false)));
     }
 }

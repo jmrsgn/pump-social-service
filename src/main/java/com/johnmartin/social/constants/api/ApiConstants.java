@@ -16,7 +16,8 @@ public class ApiConstants {
 
         // User
         public static final String API_USER = API_BASE_V1 + "/user";
-        public static final String PROFILE = "/profile";
+        public static final String USER_INFO = "/{userId}";
+        public static final String FOLLOW = USER_INFO + "/follow";
 
         // Post
         public static final String API_POST = API_BASE_V1 + "/post";
@@ -37,6 +38,7 @@ public class ApiConstants {
     public static class Params {
         public static final String POST_ID = "postId";
         public static final String COMMENT_ID = "commentId";
+        public static final String USER_ID = "userId";
     }
 
     public static class Error {

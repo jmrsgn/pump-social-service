@@ -72,7 +72,7 @@ public class PostService {
         LoggerUtility.t(clazz, String.format("post: [%s]", post));
 
         // Get social user
-        UserEntity socialUser = userService.findByEmail(authUser.email());
+        UserEntity socialUser = userService.findById(authUser.id());
         boolean isLiked = postLikeService.isPostLikedByUser(post.getId(), authUser.id());
         return PostMapper.toResponse(post, Collections.emptyList(), socialUser, isLiked);
     }

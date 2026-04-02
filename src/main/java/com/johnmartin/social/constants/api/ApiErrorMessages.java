@@ -25,6 +25,8 @@ public class ApiErrorMessages {
         public static final String USER_CREATION_FAILED = "User creation failed";
         public static final String USER_IS_NOT_AUTHENTICATED_OR_INVALID_TOKEN = USER_IS_NOT_AUTHENTICATED + " or "
                                                                                 + INVALID_TOKEN;
+        public static final String USER_ID_IS_REQUIRED = "User ID is required";
+        public static final String YOU_CANNOT_FOLLOW_YOURSELF = "You cannot follow yourself";
     }
 
     public static class Post {

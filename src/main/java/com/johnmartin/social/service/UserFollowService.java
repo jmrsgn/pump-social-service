@@ -2,7 +2,9 @@ package com.johnmartin.social.service;
 
 import org.springframework.stereotype.Service;
 
+import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.entities.UserFollowEntity;
+import com.johnmartin.social.exception.BadRequestException;
 import com.johnmartin.social.repository.UserFollowRepository;
 import com.johnmartin.social.repository.UserRepository;
 import com.johnmartin.social.utilities.LoggerUtility;
@@ -28,6 +30,11 @@ public class UserFollowService {
                         String.format("Execute method: [toggleFollow] followerId: [%s] followingId: [%s]",
                                       followerId,
                                       followingId));
+
+        // Prevent self-follow
+        if (followerId.equals(followingId)) {
+            throw new BadRequestException(ApiErrorMessages.User.YOU_CANNOT_FOLLOW_YOURSELF);
+        }
 
         boolean alreadyFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(followerId, followingId);
 

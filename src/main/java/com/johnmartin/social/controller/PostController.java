@@ -2,7 +2,6 @@ package com.johnmartin.social.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,11 +25,14 @@ import jakarta.validation.constraints.PositiveOrZero;
 @RequestMapping(ApiConstants.Path.API_POST)
 public class PostController {
 
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
 
-    @Autowired
-    private PostCommentFacade postCommentFacade;
+    private final PostCommentFacade postCommentFacade;
+
+    public PostController(PostService postService, PostCommentFacade postCommentFacade) {
+        this.postService = postService;
+        this.postCommentFacade = postCommentFacade;
+    }
 
     @GetMapping
     public ResponseEntity<Result<List<PostResponse>>> getPosts(@RequestParam(defaultValue = "0") @PositiveOrZero int page) {

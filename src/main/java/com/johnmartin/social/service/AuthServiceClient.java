@@ -1,6 +1,5 @@
 package com.johnmartin.social.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -18,8 +17,11 @@ import com.johnmartin.social.exception.UnauthorizedException;
 @Service
 public class AuthServiceClient {
 
-    @Autowired
-    private RestClient authWebClient;
+    private final RestClient authWebClient;
+
+    public AuthServiceClient(RestClient authWebClient) {
+        this.authWebClient = authWebClient;
+    }
 
     @Retryable(retryFor = Exception.class, maxAttempts = ApiConstants.RETRIES_COUNT, backoff = @Backoff(delay = UIConstants.DELAY_2000))
     public AuthUser validate(String authorizationHeader, String requestId) {

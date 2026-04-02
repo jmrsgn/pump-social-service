@@ -1,18 +1,18 @@
 package com.johnmartin.social.service;
 
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.api.ApiErrorMessages;
+import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.CreateUserRequest;
 import com.johnmartin.social.dto.response.UserResponse;
 import com.johnmartin.social.entities.UserEntity;
 import com.johnmartin.social.exception.NotFoundException;
+import com.johnmartin.social.exception.UnauthorizedException;
+import com.johnmartin.social.mapper.UserMapper;
 import com.johnmartin.social.repository.UserRepository;
+import com.johnmartin.social.security.AuthContext;
 import com.johnmartin.social.utilities.LoggerUtility;
 
 @Service
@@ -21,14 +21,16 @@ public class UserService {
     private static final Class<UserService> clazz = UserService.class;
 
     private final UserRepository userRepository;
+    private final UserFollowService userFollowService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserFollowService userFollowService) {
         this.userRepository = userRepository;
+        this.userFollowService = userFollowService;
     }
 
-    public UserEntity findByEmail(String email) {
-        LoggerUtility.d(clazz, "Execute method: [findByEmail]");
-        return userRepository.findByEmail(email)
+    public UserEntity findById(String userId) {
+        LoggerUtility.d(clazz, "Execute method: [findById]");
+        return userRepository.findById(userId)
                              .orElseThrow(() -> new NotFoundException(ApiErrorMessages.User.USER_NOT_FOUND));
     }
 
@@ -44,17 +46,18 @@ public class UserService {
         return userRepository.save(userEntity);
     }
 
-    public Optional<UserEntity> getAuthenticatedUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            return Optional.empty();
-        }
-        // Registered as subject for Auth, is email
-        return userRepository.findByEmail(auth.getName());
-    }
+    public UserResponse followUser(String userId) {
+        LoggerUtility.d(clazz, String.format("Execute method: [followUser] userId: [%s]", userId));
 
-    public UserResponse followUser() {
-        // TODO: continue
-        return null;
+        AuthUser authUser = AuthContext.get();
+        if (authUser == null) {
+            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
+            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
+        }
+
+        boolean isFollowing = userFollowService.toggleFollow(authUser.id(), userId);
+        UserEntity followedUser = findById(userId);
+        LoggerUtility.d(clazz, String.format("followedUser: [%s]", followedUser));
+        return UserMapper.toResponse(followedUser, isFollowing);
     }
 }

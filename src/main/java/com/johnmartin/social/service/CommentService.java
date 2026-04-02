@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.api.ApiErrorMessages;
@@ -34,7 +33,6 @@ public class CommentService {
     private static final Class<CommentService> clazz = CommentService.class;
 
     private final CommentRepository commentRepository;
-    private final CommentLikeRepository commentLikeRepository;
     private final PostService postService;
     private final UserService userService;
     private final CommentLikeService commentLikeService;
@@ -45,7 +43,6 @@ public class CommentService {
                           UserService userService,
                           CommentLikeService commentLikeService) {
         this.commentRepository = commentRepository;
-        this.commentLikeRepository = commentLikeRepository;
         this.postService = postService;
         this.userService = userService;
         this.commentLikeService = commentLikeService;
@@ -67,11 +64,6 @@ public class CommentService {
         if (request == null) {
             LoggerUtility.d(clazz, "Request is null, will not proceed method call");
             throw new BadRequestException(ApiErrorMessages.INVALID_REQUEST);
-        }
-
-        if (StringUtils.isBlank(postId)) {
-            LoggerUtility.d(clazz, "Post ID is null, will not proceed with create comment API");
-            throw new BadRequestException(ApiErrorMessages.Post.POST_ID_IS_REQUIRED);
         }
 
         AuthUser authUser = AuthContext.get();
@@ -101,7 +93,7 @@ public class CommentService {
 
         boolean isLiked = commentLikeService.isCommentLikedByUser(comment.getId(), authUser.id());
         // Get social user
-        UserEntity socialUser = userService.findByEmail(authUser.email());
+        UserEntity socialUser = userService.findById(authUser.id());
         return CommentMapper.toResponse(comment, socialUser, isLiked);
     }
 
@@ -118,16 +110,6 @@ public class CommentService {
                                       postId,
                                       commentId));
 
-        if (StringUtils.isBlank(postId)) {
-            LoggerUtility.d(clazz, "Post ID is null, will not proceed with delete comment API");
-            throw new BadRequestException(ApiErrorMessages.Post.POST_ID_IS_REQUIRED);
-        }
-
-        if (StringUtils.isBlank(commentId)) {
-            LoggerUtility.d(clazz, "Comment ID is null, will not proceed with delete comment API");
-            throw new BadRequestException(ApiErrorMessages.Comment.COMMENT_ID_IS_REQUIRED);
-        }
-
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
@@ -136,7 +118,7 @@ public class CommentService {
 
         PostEntity post = postService.getPostById(postId);
         CommentEntity comment = getCommentById(commentId);
-        UserEntity user = userService.findByEmail(authUser.email());
+        UserEntity user = userService.findById(authUser.id());
 
         // Ensure comment belongs to the post
         if (!comment.getPostId().equals(post.getId())) {
@@ -177,16 +159,6 @@ public class CommentService {
         LoggerUtility.d(clazz,
                         String.format("Execute method: [likeComment] postId: [%s] commentId: [%s]", postId, commentId));
 
-        if (StringUtils.isBlank(postId)) {
-            LoggerUtility.d(clazz, "Post ID is null, will not proceed with like comment API");
-            throw new BadRequestException(ApiErrorMessages.Post.POST_ID_IS_REQUIRED);
-        }
-
-        if (StringUtils.isBlank(commentId)) {
-            LoggerUtility.d(clazz, "Comment ID is null, will not proceed with like comment API");
-            throw new BadRequestException(ApiErrorMessages.Comment.COMMENT_ID_IS_REQUIRED);
-        }
-
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
@@ -198,7 +170,7 @@ public class CommentService {
 
         boolean isLiked = commentLikeService.toggleLike(comment.getId(), authUser.id());
         // Get social user
-        UserEntity socialUser = userService.findByEmail(authUser.email());
+        UserEntity socialUser = userService.findById(authUser.id());
         return CommentMapper.toResponse(comment, socialUser, isLiked);
     }
 

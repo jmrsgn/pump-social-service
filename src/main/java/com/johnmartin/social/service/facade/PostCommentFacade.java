@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -79,7 +78,7 @@ public class PostCommentFacade {
         // Extract all posts's id
         List<String> postIds = posts.stream().map(PostEntity::getId).toList();
         // Get latest comments by post ids
-        UserEntity socialUser = userService.findByEmail(authUser.email());
+        UserEntity socialUser = userService.findById(authUser.id());
         Map<String, List<CommentResponse>> commentsByPost = commentService.getLatestCommentsByPostIds(postIds,
                                                                                                       socialUser);
         // Get likedPostIds
@@ -103,11 +102,6 @@ public class PostCommentFacade {
     public PostResponse getPostInfo(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [getPostInfo] postId: [%s]", postId));
 
-        if (StringUtils.isBlank(postId)) {
-            LoggerUtility.d(clazz, "Post ID is blank, will not proceed with get post info API");
-            throw new BadRequestException(ApiErrorMessages.Post.POST_ID_IS_REQUIRED);
-        }
-
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
@@ -118,7 +112,7 @@ public class PostCommentFacade {
         LoggerUtility.d(clazz, String.format("post: [%s]", post));
 
         // Get comments
-        UserEntity socialUser = userService.findByEmail(authUser.email());
+        UserEntity socialUser = userService.findById(authUser.id());
         Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
@@ -139,11 +133,6 @@ public class PostCommentFacade {
     public PostResponse likePost(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [likePost] postId: [%s]", postId));
 
-        if (StringUtils.isBlank(postId)) {
-            LoggerUtility.d(clazz, "Post ID is blank, will not proceed with like post API");
-            throw new BadRequestException(ApiErrorMessages.Post.POST_ID_IS_REQUIRED);
-        }
-
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
@@ -153,7 +142,7 @@ public class PostCommentFacade {
         PostEntity post = postService.getPostById(postId);
         LoggerUtility.t(clazz, String.format("post: [%s]", post));
 
-        UserEntity socialUser = userService.findByEmail(authUser.email());
+        UserEntity socialUser = userService.findById(authUser.id());
         Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
@@ -172,11 +161,6 @@ public class PostCommentFacade {
     public void deletePost(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [deletePost] postId: [%s]", postId));
 
-        if (StringUtils.isBlank(postId)) {
-            LoggerUtility.d(clazz, "Post ID is blank, will not proceed with delete post API");
-            throw new BadRequestException(ApiErrorMessages.Post.POST_ID_IS_REQUIRED);
-        }
-
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
@@ -184,7 +168,7 @@ public class PostCommentFacade {
         }
 
         PostEntity post = postService.getPostById(postId);
-        UserEntity user = userService.findByEmail(authUser.email());
+        UserEntity user = userService.findById(authUser.id());
 
         // Only post owner can delete
         if (!post.getAuthorId().equals(user.getId())) {
@@ -224,11 +208,6 @@ public class PostCommentFacade {
             throw new BadRequestException(ApiErrorMessages.INVALID_REQUEST);
         }
 
-        if (StringUtils.isBlank(postId)) {
-            LoggerUtility.d(clazz, "Post ID is blank, will not proceed with update post API");
-            throw new BadRequestException(ApiErrorMessages.Post.POST_ID_IS_REQUIRED);
-        }
-
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
@@ -247,7 +226,7 @@ public class PostCommentFacade {
         post.setDescription(request.description());
 
         // Get social user
-        UserEntity socialUser = userService.findByEmail(authUser.email());
+        UserEntity socialUser = userService.findById(authUser.id());
         Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
