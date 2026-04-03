@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.johnmartin.social.constants.entities.CommentEntityConstants;
 
@@ -19,16 +20,23 @@ public class CommentEntity {
 
     @Id
     private String id;
+    @Field(name = CommentEntityConstants.COLUMN_COMMENT)
     private String comment;
+    @Field(name = CommentEntityConstants.COLUMN_AUTHOR_ID)
     private String authorId;
+    @Field(name = CommentEntityConstants.COLUMN_POST_ID)
     private String postId;
 
+    @Field(name = CommentEntityConstants.COLUMN_LIKES_COUNT)
     private int likesCount;
+    @Field(name = CommentEntityConstants.COLUMN_REPLIES_COUNT)
     private int repliesCount;
 
     @CreatedDate
+    @Field(name = CommentEntityConstants.COLUMN_CREATED_AT)
     private Instant createdAt;
     @LastModifiedDate
+    @Field(name = CommentEntityConstants.COLUMN_UPDATED_AT)
     private Instant updatedAt;
 
     @Override
