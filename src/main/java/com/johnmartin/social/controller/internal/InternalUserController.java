@@ -1,21 +1,15 @@
 package com.johnmartin.social.controller.internal;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.johnmartin.social.constants.api.ApiConstants;
-import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.request.CreateUserRequest;
-import com.johnmartin.social.dto.response.Result;
-import com.johnmartin.social.dto.response.UserResponse;
 import com.johnmartin.social.entities.UserEntity;
-import com.johnmartin.social.mapper.UserMapper;
 import com.johnmartin.social.service.UserService;
 import com.johnmartin.social.utilities.LoggerUtility;
-import com.johnmartin.social.utils.ApiErrorUtils;
 
 import jakarta.validation.Valid;
 
@@ -32,14 +26,13 @@ public class InternalUserController {
     }
 
     @PostMapping(ApiConstants.InternalPath.CREATE_USER)
-    public ResponseEntity<Result<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
+    public void createUser(@Valid @RequestBody CreateUserRequest request) {
         UserEntity socialUser = userService.createUser(request);
         if (socialUser == null) {
             LoggerUtility.d(clazz, "User creation failed");
-            return ApiErrorUtils.createBadRequestErrorResponse(ApiErrorMessages.User.USER_CREATION_FAILED);
+            throw new RuntimeException("User creation failed");
         }
 
         LoggerUtility.d(clazz, String.format("socialUser: [%s]", socialUser));
-        return ResponseEntity.ok(Result.success(UserMapper.toResponse(socialUser, false)));
     }
 }

@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.johnmartin.social.constants.api.ApiConstants;
-import com.johnmartin.social.constants.api.ApiErrorMessages;
-import com.johnmartin.social.dto.response.Result;
 import com.johnmartin.social.dto.response.UserResponse;
+import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.service.UserService;
 
 import jakarta.validation.constraints.NotBlank;
@@ -25,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping(ApiConstants.Path.FOLLOW)
-    public ResponseEntity<Result<UserResponse>> followUser(@PathVariable(ApiConstants.Params.USER_ID) @NotBlank(message = ApiErrorMessages.User.USER_ID_IS_REQUIRED) String userId) {
+    public ResponseEntity<Result<UserResponse>> followUser(@PathVariable(ApiConstants.Params.USER_ID) @NotBlank(message = "User ID is required") String userId) {
         UserResponse followedUser = userService.followUser(userId);
         return ResponseEntity.ok(Result.success(followedUser));
     }

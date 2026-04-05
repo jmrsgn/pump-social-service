@@ -11,21 +11,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.UIConstants;
-import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.UpdatePostRequest;
 import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.dto.response.PostResponse;
+import com.johnmartin.social.dto.response.common.PagedResponse;
 import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.UserEntity;
 import com.johnmartin.social.exception.BadRequestException;
 import com.johnmartin.social.exception.UnauthorizedException;
 import com.johnmartin.social.mapper.PostMapper;
-import com.johnmartin.social.security.AuthContext;
-import com.johnmartin.social.service.CommentService;
-import com.johnmartin.social.service.PostLikeService;
-import com.johnmartin.social.service.PostService;
-import com.johnmartin.social.service.UserService;
+import com.johnmartin.social.service.*;
 import com.johnmartin.social.utilities.LoggerUtility;
 
 import jakarta.transaction.Transactional;
@@ -39,15 +35,18 @@ public class PostCommentFacade {
     private final CommentService commentService;
     private final PostLikeService postLikeService;
     private final UserService userService;
+    private final AuthService authService;
 
     public PostCommentFacade(PostService postService,
                              CommentService commentService,
                              PostLikeService postLikeService,
-                             UserService userService) {
+                             UserService userService,
+                             AuthService authService) {
         this.postService = postService;
         this.commentService = commentService;
         this.postLikeService = postLikeService;
         this.userService = userService;
+        this.authService = authService;
     }
 
     /**
@@ -57,39 +56,44 @@ public class PostCommentFacade {
      *            - page
      * @return List of PostResponse
      */
-    public List<PostResponse> getPostsWithLatestComments(int page) {
+    public PagedResponse<PostResponse> getPostsWithLatestComments(int page) {
         LoggerUtility.d(clazz, String.format("Execute method: [getPostsWithLatestComments], page: [%d]", page));
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
+        // Get posts per page
         PageRequest pageRequest = PageRequest.of(page, UIConstants.MINIMUM_POSTS);
         Page<PostEntity> postPage = postService.getPostsWithLatestComments(pageRequest);
         List<PostEntity> posts = postPage.getContent();
 
         LoggerUtility.d(clazz, String.format("posts size: [%s]", posts.size()));
         if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
+            return new PagedResponse<>(Collections.emptyList(), page, UIConstants.MINIMUM_POSTS, 0, 0, false);
         }
 
         // Extract all posts's id
         List<String> postIds = posts.stream().map(PostEntity::getId).toList();
         // Get latest comments by post ids
         UserEntity socialUser = userService.findById(authUser.id());
+        // Get latest comments per post
         Map<String, List<CommentResponse>> commentsByPost = commentService.getLatestCommentsByPostIds(postIds,
                                                                                                       socialUser);
         // Get likedPostIds
         Set<String> likedPostIds = postLikeService.getLikedPostIds(postIds, socialUser.getId());
-        return posts.stream()
-                    .map(post -> PostMapper.toResponse(post,
-                                                       commentsByPost.getOrDefault(post.getId(),
-                                                                                   Collections.emptyList()),
-                                                       socialUser,
-                                                       likedPostIds.contains(post.getId())))
-                    .toList();
+        List<PostResponse> postResponseList = posts.stream()
+                                                   .map(post -> PostMapper.toResponse(post,
+                                                                                      commentsByPost.getOrDefault(post.getId(),
+                                                                                                                  Collections.emptyList()),
+                                                                                      socialUser,
+                                                                                      likedPostIds.contains(post.getId())))
+                                                   .toList();
+        return new PagedResponse<>(postResponseList,
+                                   postPage.getNumber(),
+                                   postPage.getSize(),
+                                   postPage.getTotalElements(),
+                                   postPage.getTotalPages(),
+                                   postPage.hasNext());
     }
 
     /**
@@ -102,16 +106,14 @@ public class PostCommentFacade {
     public PostResponse getPostInfo(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [getPostInfo] postId: [%s]", postId));
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
+        // Get post
         PostEntity post = postService.getPostById(postId);
         LoggerUtility.d(clazz, String.format("post: [%s]", post));
 
-        // Get comments
+        // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
         Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
                                                                                                 socialUser);
@@ -133,16 +135,16 @@ public class PostCommentFacade {
     public PostResponse likePost(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [likePost] postId: [%s]", postId));
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
+        // Get post
         PostEntity post = postService.getPostById(postId);
         LoggerUtility.t(clazz, String.format("post: [%s]", post));
 
+        // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
+        // Get comments of liked post
         Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
@@ -161,18 +163,18 @@ public class PostCommentFacade {
     public void deletePost(String postId) {
         LoggerUtility.d(clazz, String.format("Execute method: [deletePost] postId: [%s]", postId));
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
+        // Get post
         PostEntity post = postService.getPostById(postId);
-        UserEntity user = userService.findById(authUser.id());
+
+        // Get social user
+        UserEntity socialUser = userService.findById(authUser.id());
 
         // Only post owner can delete
-        if (!post.getAuthorId().equals(user.getId())) {
-            throw new UnauthorizedException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
+        if (!post.getAuthorId().equals(socialUser.getId())) {
+            throw new UnauthorizedException("You are not authorized to perform this action");
         }
 
         try {
@@ -205,20 +207,18 @@ public class PostCommentFacade {
 
         if (request == null) {
             LoggerUtility.d(clazz, "Request is null, will not proceed method call");
-            throw new BadRequestException(ApiErrorMessages.INVALID_REQUEST);
+            throw new BadRequestException("Invalid request");
         }
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
+        // Get post
         PostEntity post = postService.getPostById(postId);
 
         // Only owner can edit
         if (!post.getAuthorId().equals(authUser.id())) {
-            throw new UnauthorizedException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
+            throw new UnauthorizedException("You are not authorized to perform this action");
         }
 
         // Update allowed fields only
@@ -227,6 +227,7 @@ public class PostCommentFacade {
 
         // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
+        // Get latest comments of updated post
         Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));

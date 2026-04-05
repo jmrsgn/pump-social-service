@@ -3,7 +3,6 @@ package com.johnmartin.social.service;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.CreateUserRequest;
 import com.johnmartin.social.dto.response.UserResponse;
@@ -30,8 +29,7 @@ public class UserService {
 
     public UserEntity findById(String userId) {
         LoggerUtility.d(clazz, "Execute method: [findById]");
-        return userRepository.findById(userId)
-                             .orElseThrow(() -> new NotFoundException(ApiErrorMessages.User.USER_NOT_FOUND));
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     public UserEntity createUser(CreateUserRequest request) {
@@ -52,7 +50,7 @@ public class UserService {
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
+            throw new UnauthorizedException("User is not authenticated");
         }
 
         boolean isFollowing = userFollowService.toggleFollow(authUser.id(), userId);

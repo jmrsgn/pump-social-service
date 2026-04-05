@@ -8,8 +8,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.api.ApiConstants;
-import com.johnmartin.social.dto.response.ApiErrorResponse;
-import com.johnmartin.social.dto.response.Result;
+import com.johnmartin.social.dto.response.common.ApiErrorResponse;
+import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.exception.UnauthorizedException;
 
 import jakarta.servlet.FilterChain;

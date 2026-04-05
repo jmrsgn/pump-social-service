@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.constants.api.ApiErrorMessages;
+import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.CreateCommentRequest;
 import com.johnmartin.social.dto.response.CommentResponse;
@@ -22,7 +22,6 @@ import com.johnmartin.social.exception.UnauthorizedException;
 import com.johnmartin.social.mapper.CommentMapper;
 import com.johnmartin.social.repository.CommentLikeRepository;
 import com.johnmartin.social.repository.CommentRepository;
-import com.johnmartin.social.security.AuthContext;
 import com.johnmartin.social.utilities.LoggerUtility;
 
 import jakarta.transaction.Transactional;
@@ -33,19 +32,23 @@ public class CommentService {
     private static final Class<CommentService> clazz = CommentService.class;
 
     private final CommentRepository commentRepository;
+
     private final PostService postService;
     private final UserService userService;
     private final CommentLikeService commentLikeService;
+    private final AuthService authService;
 
     public CommentService(CommentRepository commentRepository,
                           CommentLikeRepository commentLikeRepository,
                           PostService postService,
                           UserService userService,
-                          CommentLikeService commentLikeService) {
+                          CommentLikeService commentLikeService,
+                          AuthService authService) {
         this.commentRepository = commentRepository;
         this.postService = postService;
         this.userService = userService;
         this.commentLikeService = commentLikeService;
+        this.authService = authService;
     }
 
     /**
@@ -63,18 +66,16 @@ public class CommentService {
 
         if (request == null) {
             LoggerUtility.d(clazz, "Request is null, will not proceed method call");
-            throw new BadRequestException(ApiErrorMessages.INVALID_REQUEST);
+            throw new BadRequestException("Invalid request");
         }
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
-        // Get valid post
+        // Get post
         PostEntity post = postService.getPostById(postId);
 
+        // Create a comment
         CommentEntity createdComment = new CommentEntity();
         createdComment.setComment(request.comment());
         createdComment.setAuthorId(authUser.id());
@@ -110,28 +111,29 @@ public class CommentService {
                                       postId,
                                       commentId));
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
+        // Get post
         PostEntity post = postService.getPostById(postId);
+
+        // Get comment
         CommentEntity comment = getCommentById(commentId);
+
+        // Get social user
         UserEntity user = userService.findById(authUser.id());
 
         // Ensure comment belongs to the post
         if (!comment.getPostId().equals(post.getId())) {
-            throw new BadRequestException(ApiErrorMessages.Comment.THE_COMMENT_DOES_NOT_BELONG_TO_THE_SPECIFIED_POST);
+            throw new BadRequestException("The comment does not belong to the specified post");
         }
 
         // Only comment owner can delete
         if (!comment.getAuthorId().equals(user.getId())) {
-            throw new UnauthorizedException(ApiErrorMessages.User.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
+            throw new UnauthorizedException("You are not authorized to perform this action");
         }
 
         try {
-
             // Delete comment
             commentRepository.deleteById(commentId);
 
@@ -159,12 +161,10 @@ public class CommentService {
         LoggerUtility.d(clazz,
                         String.format("Execute method: [likeComment] postId: [%s] commentId: [%s]", postId, commentId));
 
-        AuthUser authUser = AuthContext.get();
-        if (authUser == null) {
-            LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException(ApiErrorMessages.User.USER_IS_NOT_AUTHENTICATED);
-        }
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
 
+        // Get comment
         CommentEntity comment = getCommentById(commentId);
         LoggerUtility.t(clazz, String.format("comment: [%s]", comment));
 
@@ -194,16 +194,25 @@ public class CommentService {
      */
     private CommentEntity getCommentById(String commentId) {
         LoggerUtility.d(clazz, String.format("Execute method: [getCommentById] commentId: [%s]", commentId));
-        return commentRepository.findById(commentId)
-                                .orElseThrow(() -> new NotFoundException(ApiErrorMessages.Comment.COMMENT_NOT_FOUND));
+        return commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comment not found"));
     }
 
+    /**
+     * Get latest comments of all posts
+     * 
+     * @param postIds
+     *            - Post IDs
+     * @param socialUser
+     *            - Social user
+     * @return Map<String, List<CommentResponse>>
+     */
     public Map<String, List<CommentResponse>> getLatestCommentsByPostIds(List<String> postIds, UserEntity socialUser) {
         LoggerUtility.d(clazz,
                         String.format("Execute method: [getLatestCommentsByPostIds] postIds: [%s] socialUser: [%s]",
                                       postIds,
                                       socialUser));
 
+        // Get latest comments
         List<CommentEntity> comments = commentRepository.findByPostIdInOrderByCreatedAtDesc(postIds);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
@@ -219,6 +228,10 @@ public class CommentService {
                        .map(comment -> CommentMapper.toResponse(comment,
                                                                 socialUser,
                                                                 likedPostIds.contains(comment.getId())))
-                       .collect(Collectors.groupingBy(CommentResponse::postId));
+                       .collect(Collectors.groupingBy(CommentResponse::postId,
+                                                      Collectors.collectingAndThen(Collectors.toList(),
+                                                                                   list -> list.stream()
+                                                                                               .limit(UIConstants.MINIMUM_COMMENTS_PER_POST)
+                                                                                               .toList())));
     }
 }

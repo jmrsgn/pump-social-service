@@ -2,7 +2,6 @@ package com.johnmartin.social.service;
 
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.entities.UserFollowEntity;
 import com.johnmartin.social.exception.BadRequestException;
 import com.johnmartin.social.repository.UserFollowRepository;
@@ -33,7 +32,7 @@ public class UserFollowService {
 
         // Prevent self-follow
         if (followerId.equals(followingId)) {
-            throw new BadRequestException(ApiErrorMessages.User.YOU_CANNOT_FOLLOW_YOURSELF);
+            throw new BadRequestException("You cannot follow yourself");
         }
 
         boolean alreadyFollowing = userFollowRepository.existsByFollowerIdAndFollowingId(followerId, followingId);

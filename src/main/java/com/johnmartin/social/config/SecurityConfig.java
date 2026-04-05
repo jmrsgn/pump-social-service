@@ -14,7 +14,7 @@ import com.johnmartin.social.security.custom.CustomAuthEntryPoint;
 import com.johnmartin.social.security.filter.AuthContextFilter;
 import com.johnmartin.social.security.filter.CorrelationIdFilter;
 import com.johnmartin.social.security.filter.RequestLoggingFilter;
-import com.johnmartin.social.service.AuthServiceClient;
+import com.johnmartin.social.service.client.AuthServiceClient;
 
 @Configuration
 public class SecurityConfig {

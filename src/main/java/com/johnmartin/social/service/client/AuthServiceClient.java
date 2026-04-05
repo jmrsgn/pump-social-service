@@ -1,4 +1,4 @@
-package com.johnmartin.social.service;
+package com.johnmartin.social.service.client;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.retry.annotation.Backoff;
@@ -10,7 +10,6 @@ import org.springframework.web.client.RestClient;
 import com.johnmartin.social.constants.SecurityConstants;
 import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.constants.api.ApiConstants;
-import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.exception.UnauthorizedException;
 
@@ -33,7 +32,7 @@ public class AuthServiceClient {
                                 .retrieve()
                                 .body(AuthUser.class);
         } catch (HttpClientErrorException.Unauthorized ex) {
-            throw new UnauthorizedException(ApiErrorMessages.User.INVALID_TOKEN);
+            throw new UnauthorizedException("Invalid token");
         }
     }
 }

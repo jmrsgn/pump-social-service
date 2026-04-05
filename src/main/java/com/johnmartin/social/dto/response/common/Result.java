@@ -1,4 +1,4 @@
-package com.johnmartin.social.dto.response;
+package com.johnmartin.social.dto.response.common;
 
 import java.util.Optional;
 

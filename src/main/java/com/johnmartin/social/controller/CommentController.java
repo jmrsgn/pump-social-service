@@ -5,10 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.johnmartin.social.constants.api.ApiConstants;
-import com.johnmartin.social.constants.api.ApiErrorMessages;
 import com.johnmartin.social.dto.request.CreateCommentRequest;
 import com.johnmartin.social.dto.response.CommentResponse;
-import com.johnmartin.social.dto.response.Result;
+import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.service.CommentService;
 
 import jakarta.validation.Valid;
@@ -26,22 +25,22 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<Result<CommentResponse>> createComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = ApiErrorMessages.Post.POST_ID_IS_REQUIRED) String postId,
+    public ResponseEntity<Result<CommentResponse>> createComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = "Post ID is required") String postId,
                                                                  @Valid @RequestBody CreateCommentRequest createCommentRequest) {
         CommentResponse createdComment = commentService.createComment(postId, createCommentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(createdComment));
     }
 
     @DeleteMapping(ApiConstants.Path.COMMENT_INFO)
-    public ResponseEntity<Result<Void>> deleteComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = ApiErrorMessages.Post.POST_ID_IS_REQUIRED) String postId,
-                                                      @PathVariable(ApiConstants.Params.COMMENT_ID) @NotBlank(message = ApiErrorMessages.Comment.COMMENT_ID_IS_REQUIRED) String commentId) {
+    public ResponseEntity<Result<Void>> deleteComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = "Post ID is required") String postId,
+                                                      @PathVariable(ApiConstants.Params.COMMENT_ID) @NotBlank(message = "Comment ID is required") String commentId) {
         commentService.deleteComment(postId, commentId);
         return ResponseEntity.ok(Result.success(null));
     }
 
     @PostMapping(ApiConstants.Path.COMMENT_LIKE)
-    public ResponseEntity<Result<CommentResponse>> likeComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = ApiErrorMessages.Post.POST_ID_IS_REQUIRED) String postId,
-                                                               @PathVariable(ApiConstants.Params.COMMENT_ID) @NotBlank(message = ApiErrorMessages.Comment.COMMENT_ID_IS_REQUIRED) String commentId) {
+    public ResponseEntity<Result<CommentResponse>> likeComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = "Post ID is required") String postId,
+                                                               @PathVariable(ApiConstants.Params.COMMENT_ID) @NotBlank(message = "Comment ID is required") String commentId) {
         CommentResponse response = commentService.likeComment(postId, commentId);
         return ResponseEntity.ok(Result.success(response));
     }
