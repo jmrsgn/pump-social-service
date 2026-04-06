@@ -32,7 +32,13 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
-    public UserEntity createUser(CreateUserRequest request) {
+    public UserResponse getUserById(String userId) {
+        LoggerUtility.d(clazz, "Execute method: [getUserById]");
+        UserEntity user = findById(userId);
+        return UserMapper.toResponse(user, false);
+    }
+
+    public UserResponse createUser(CreateUserRequest request) {
         LoggerUtility.d(clazz, "Execute method: [createUser]");
         UserEntity userEntity = new UserEntity();
         userEntity.setId(request.id());
@@ -41,7 +47,9 @@ public class UserService {
         userEntity.setEmail(request.email());
         userEntity.setProfileImageUrl(StringUtils.EMPTY);
         userEntity.setBio(StringUtils.EMPTY);
-        return userRepository.save(userEntity);
+
+        UserEntity createdUser = userRepository.save(userEntity);
+        return UserMapper.toResponse(createdUser, false);
     }
 
     public UserResponse followUser(String userId) {

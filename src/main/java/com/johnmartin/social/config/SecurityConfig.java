@@ -62,7 +62,9 @@ public class SecurityConfig {
                                                                                                       + "/**")
                                                          .permitAll()
                                                          .requestMatchers(ApiConstants.InternalPath.API_USER_INTERNAL
-                                                                          + ApiConstants.InternalPath.CREATE_USER)
+                                                                          + ApiConstants.InternalPath.CREATE_USER,
+                                                                          ApiConstants.InternalPath.API_USER_INTERNAL
+                                                                                                                   + ApiConstants.InternalPath.GET_USER)
                                                          .permitAll()
                                                          .requestMatchers(ApiConstants.Path.ACTUATOR + "/**")
                                                          .denyAll()

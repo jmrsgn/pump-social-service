@@ -1,23 +1,20 @@
 package com.johnmartin.social.controller.internal;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.dto.request.CreateUserRequest;
-import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.dto.response.UserResponse;
+import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.service.UserService;
-import com.johnmartin.social.utilities.LoggerUtility;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping(ApiConstants.InternalPath.API_USER_INTERNAL)
 public class InternalUserController {
-
-    private static final Class<InternalUserController> clazz = InternalUserController.class;
 
     private final UserService userService;
 
@@ -26,13 +23,14 @@ public class InternalUserController {
     }
 
     @PostMapping(ApiConstants.InternalPath.CREATE_USER)
-    public void createUser(@Valid @RequestBody CreateUserRequest request) {
-        UserEntity socialUser = userService.createUser(request);
-        if (socialUser == null) {
-            LoggerUtility.d(clazz, "User creation failed");
-            throw new RuntimeException("User creation failed");
-        }
+    public ResponseEntity<Result<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
+        UserResponse user = userService.createUser(request);
+        return ResponseEntity.ok(Result.success(user));
+    }
 
-        LoggerUtility.d(clazz, String.format("socialUser: [%s]", socialUser));
+    @GetMapping(ApiConstants.InternalPath.GET_USER)
+    public ResponseEntity<Result<UserResponse>> getUser(@PathVariable(ApiConstants.Params.USER_ID) @NotBlank(message = "User ID is required") String userId) {
+        UserResponse user = userService.getUserById(userId);
+        return ResponseEntity.ok(Result.success(user));
     }
 }

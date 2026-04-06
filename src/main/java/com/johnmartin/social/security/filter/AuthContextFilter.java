@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.SecurityConstants;
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.dto.AuthUser;
+import com.johnmartin.social.dto.internal.AuthUserResponse;
 import com.johnmartin.social.exception.UnauthorizedException;
+import com.johnmartin.social.mapper.UserMapper;
 import com.johnmartin.social.security.AuthContext;
 import com.johnmartin.social.service.client.AuthServiceClient;
 import com.johnmartin.social.utilities.LoggerUtility;
@@ -40,8 +42,11 @@ public class AuthContextFilter extends BaseFilter {
         LoggerUtility.d(clazz, String.format("requestId: [%s]", requestId));
 
         // Auth details will be handled in AuthService
-        AuthUser authUser = authService.validate(authHeader, requestId);
-        LoggerUtility.d(clazz, String.format("authUser: [%s]", authUser));
+        AuthUserResponse authUserResponse = authService.validate(authHeader, requestId);
+        LoggerUtility.d(clazz, String.format("authUser: [%s]", authUserResponse));
+
+        // Added entity with same fields for design
+        AuthUser authUser = UserMapper.toAuthUser(authUserResponse);
         AuthContext.set(authUser);
 
         // REQUIRED: put authUser to Spring Security Context
