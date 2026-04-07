@@ -27,7 +27,7 @@ public class AuthServiceClient {
     @Retryable(retryFor = Exception.class, maxAttempts = ApiConstants.RETRIES_COUNT, backoff = @Backoff(delay = UIConstants.DELAY_2000))
     public AuthUserResponse validate(String authorizationHeader, String requestId) {
         try {
-            Result<AuthUserResponse> result = authWebClient.get()
+            Result<AuthUserResponse> result = authWebClient.post()
                                                            .uri(ApiConstants.PumpAuthService.API_VALIDATE)
                                                            .header(HttpHeaders.AUTHORIZATION, authorizationHeader)
                                                            .header(SecurityConstants.REQUEST_ID, requestId)
