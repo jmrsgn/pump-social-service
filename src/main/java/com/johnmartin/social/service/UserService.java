@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.error.AuthErrorConstants;
-import com.johnmartin.social.constants.error.UserErrorConstants;
+import com.johnmartin.social.constants.error.domain.UserErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.CreateUserRequest;
 import com.johnmartin.social.dto.response.UserResponse;

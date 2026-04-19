@@ -1,4 +1,4 @@
-package com.johnmartin.social.constants.error;
+package com.johnmartin.social.constants.error.domain;
 
 public final class CommentErrorConstants {
 

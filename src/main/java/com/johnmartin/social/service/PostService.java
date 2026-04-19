@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.constants.error.PostErrorConstants;
+import com.johnmartin.social.constants.error.domain.PostErrorConstants;
 import com.johnmartin.social.constants.error.SystemErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.CreatePostRequest;

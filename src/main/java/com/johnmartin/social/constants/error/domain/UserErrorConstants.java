@@ -1,4 +1,4 @@
-package com.johnmartin.social.constants.error;
+package com.johnmartin.social.constants.error.domain;
 
 public final class UserErrorConstants {
 
@@ -6,4 +6,6 @@ public final class UserErrorConstants {
     }
 
     public static final String USER_NOT_FOUND = "User not found";
+
+
 }

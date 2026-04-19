@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.SecurityConstants;
 import com.johnmartin.social.constants.api.ApiConstants;
+import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.internal.AuthUserResponse;
 import com.johnmartin.social.exception.UnauthorizedException;
@@ -36,7 +37,7 @@ public class AuthContextFilter extends BaseFilter {
         String requestId = (String) request.getAttribute(SecurityConstants.HttpHeaders.REQUEST_ID);
 
         if (StringUtils.isBlank(authHeader)) {
-            throw new UnauthorizedException("Missing Authentication Header");
+            throw new UnauthorizedException(AuthErrorConstants.MISSING_AUTHENTICATION_HEADER);
         }
 
         LoggerUtility.d(clazz, String.format("requestId: [%s]", requestId));

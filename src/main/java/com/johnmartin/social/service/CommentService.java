@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.constants.error.AuthErrorConstants;
-import com.johnmartin.social.constants.error.CommentErrorConstants;
+import com.johnmartin.social.constants.error.domain.CommentErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.entities.CommentEntity;
