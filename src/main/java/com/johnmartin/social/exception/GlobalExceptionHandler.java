@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.johnmartin.social.dto.response.common.ApiErrorResponse;
+import com.johnmartin.social.dto.response.common.Result;
+import com.johnmartin.social.utilities.LoggerUtility;
 import com.johnmartin.social.utils.ApiResponseUtils;
 
 import jakarta.validation.ConstraintViolationException;
@@ -14,33 +17,41 @@ import jakarta.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Class<GlobalExceptionHandler> clazz = GlobalExceptionHandler.class;
+
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleBadRequestException(BadRequestException ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         return ApiResponseUtils.createBadRequestErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<?> handleUnauthorizedException(UnauthorizedException ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleUnauthorizedException(UnauthorizedException ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         return ApiResponseUtils.createUnauthorizedErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> handleNotFoundException(NotFoundException ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleNotFoundException(NotFoundException ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         return ApiResponseUtils.createNotFoundErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<?> handleConflictException(ConflictException ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleConflictException(ConflictException ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         return ApiResponseUtils.createConflictErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(HttpClientErrorException.Forbidden.class)
-    public ResponseEntity<?> handleForbiddenException(ConflictException ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleForbiddenException(ConflictException ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         return ApiResponseUtils.createForbiddenErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleException(Exception ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         return ApiResponseUtils.createInternalServerErrorResponse(ex.getMessage());
     }
 
@@ -52,7 +63,8 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         // Get the first error message will be thrown in Bean annotations for requests
         String message = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return ApiResponseUtils.createBadRequestErrorResponse(message);
@@ -66,7 +78,8 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException ex) {
+    public ResponseEntity<Result<ApiErrorResponse>> handleConstraintViolationException(ConstraintViolationException ex) {
+        LoggerUtility.e(clazz, ex.getMessage(), ex);
         String message = ex.getConstraintViolations().iterator().next().getMessage();
         return ApiResponseUtils.createBadRequestErrorResponse(message);
     }

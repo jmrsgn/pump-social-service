@@ -1,6 +1,6 @@
 package com.johnmartin.social.constants.entities;
 
-public class PostEntityConstants {
+public final class PostEntityConstants {
 
     private PostEntityConstants() {
     }
@@ -17,7 +17,11 @@ public class PostEntityConstants {
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_UPDATED_AT = "updated_at";
 
-    public static class PostLike {
+    public static final class PostLike {
+
+        private PostLike() {
+        }
+
         public static final String TABLE_NAME = "post_likes";
         public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_POST_ID = "post_id";

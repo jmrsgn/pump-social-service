@@ -1,0 +1,9 @@
+package com.johnmartin.social.constants.error;
+
+public final class SystemErrorConstants {
+
+    private SystemErrorConstants() {
+    }
+
+    public static final String INVALID_REQUEST = "Invalid request";
+}

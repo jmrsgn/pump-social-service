@@ -6,6 +6,7 @@ public record UserResponse(String id,
                            String email,
                            String profileImageUrl,
                            String bio,
+
                            long followersNo,
                            long followingNo,
                            boolean isFollowing) {

@@ -1,6 +1,6 @@
 package com.johnmartin.social.constants;
 
-public class UIConstants {
+public final class UIConstants {
 
     private UIConstants() {
     }

@@ -1,6 +1,6 @@
 package com.johnmartin.social.constants.entities;
 
-public class UserEntityConstants {
+public final class UserEntityConstants {
 
     private UserEntityConstants() {
     }
@@ -16,7 +16,11 @@ public class UserEntityConstants {
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_UPDATED_AT = "updated_at";
 
-    public static class UserFollow {
+    public static final class UserFollow {
+
+        private UserFollow() {
+        }
+
         public static final String TABLE_NAME = "user_follows";
         public static final String COLUMN_FOLLOWER_ID = "follower_id";
         public static final String COLUMN_FOLLOWING_ID = "following_id";

@@ -1,6 +1,6 @@
 package com.johnmartin.social.constants.entities;
 
-public class CommentEntityConstants {
+public final class CommentEntityConstants {
 
     private CommentEntityConstants() {
     }
@@ -14,7 +14,11 @@ public class CommentEntityConstants {
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_UPDATED_AT = "updated_at";
 
-    public static class CommentLike {
+    public static final class CommentLike {
+
+        private CommentLike() {
+        }
+
         public static final String TABLE_NAME = "comment_likes";
         public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_COMMENT_ID = "comment_id";

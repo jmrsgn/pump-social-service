@@ -33,7 +33,7 @@ public class AuthContextFilter extends BaseFilter {
     @Override
     protected void doFilterAction(HttpServletRequest request, HttpServletResponse response) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String requestId = (String) request.getAttribute(SecurityConstants.REQUEST_ID);
+        String requestId = (String) request.getAttribute(SecurityConstants.HttpHeaders.REQUEST_ID);
 
         if (StringUtils.isBlank(authHeader)) {
             throw new UnauthorizedException("Missing Authentication Header");

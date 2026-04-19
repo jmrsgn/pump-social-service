@@ -2,6 +2,7 @@ package com.johnmartin.social.service;
 
 import org.springframework.stereotype.Service;
 
+import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.exception.UnauthorizedException;
 import com.johnmartin.social.security.AuthContext;
@@ -22,7 +23,7 @@ public class AuthService {
         AuthUser authUser = AuthContext.get();
         if (authUser == null) {
             LoggerUtility.d(clazz, "Auth user is null, will throw unauthorized exception");
-            throw new UnauthorizedException("User is not authenticated");
+            throw new UnauthorizedException(AuthErrorConstants.USER_IS_NOT_AUTHENTICATED);
         }
         return authUser;
     }

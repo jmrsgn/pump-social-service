@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.UIConstants;
+import com.johnmartin.social.constants.error.AuthErrorConstants;
+import com.johnmartin.social.constants.error.SystemErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.UpdatePostRequest;
 import com.johnmartin.social.dto.response.CommentResponse;
@@ -174,7 +176,7 @@ public class PostCommentFacade {
 
         // Only post owner can delete
         if (!post.getAuthorId().equals(socialUser.getId())) {
-            throw new UnauthorizedException("You are not authorized to perform this action");
+            throw new UnauthorizedException(AuthErrorConstants.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
         }
 
         try {
@@ -207,7 +209,7 @@ public class PostCommentFacade {
 
         if (request == null) {
             LoggerUtility.d(clazz, "Request is null, will not proceed method call");
-            throw new BadRequestException("Invalid request");
+            throw new BadRequestException(SystemErrorConstants.INVALID_REQUEST);
         }
 
         // Get auth user
@@ -218,7 +220,7 @@ public class PostCommentFacade {
 
         // Only owner can edit
         if (!post.getAuthorId().equals(authUser.id())) {
-            throw new UnauthorizedException("You are not authorized to perform this action");
+            throw new UnauthorizedException(AuthErrorConstants.YOU_ARE_NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION);
         }
 
         // Update allowed fields only

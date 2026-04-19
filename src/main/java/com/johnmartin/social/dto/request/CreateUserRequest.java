@@ -1,9 +1,11 @@
 package com.johnmartin.social.dto.request;
 
+import com.johnmartin.social.constants.error.ValidationErrorConstants;
+
 import jakarta.validation.constraints.NotBlank;
 
-public record CreateUserRequest(@NotBlank(message = "User ID is missing in request") String id,
-                                @NotBlank(message = "First name is required") String firstName,
-                                @NotBlank(message = "Last name is required") String lastName,
-                                @NotBlank(message = "Email is required") String email) {
+public record CreateUserRequest(@NotBlank(message = ValidationErrorConstants.USER_ID_IS_REQUIRED) String id,
+                                @NotBlank(message = ValidationErrorConstants.FIRST_NAME_IS_REQUIRED) String firstName,
+                                @NotBlank(message = ValidationErrorConstants.LAST_NAME_IS_REQUIRED) String lastName,
+                                @NotBlank(message = ValidationErrorConstants.EMAIL_IS_REQUIRED) String email) {
 }

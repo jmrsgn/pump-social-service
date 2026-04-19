@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.api.ApiConstants;
+import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.dto.response.common.ApiErrorResponse;
 import com.johnmartin.social.dto.response.common.Result;
 
@@ -35,6 +36,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.getWriter()
                 .write(objectMapper.writeValueAsString(Result.failure(new ApiErrorResponse(HttpStatus.FORBIDDEN.value(),
                                                                                            ApiConstants.Error.BAD_REQUEST,
-                                                                                           "Bad request"))));
+                                                                                           AuthErrorConstants.BAD_REQUEST))));
     }
 }

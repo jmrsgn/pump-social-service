@@ -22,7 +22,7 @@ public class CorrelationIdFilter extends BaseFilter {
 
     @Override
     protected void doFilterAction(HttpServletRequest request, HttpServletResponse response) {
-        String requestId = request.getHeader(SecurityConstants.REQUEST_ID);
+        String requestId = request.getHeader(SecurityConstants.HttpHeaders.REQUEST_ID);
 
         if (StringUtils.isBlank(requestId)) {
             requestId = UUID.randomUUID().toString();
@@ -30,13 +30,13 @@ public class CorrelationIdFilter extends BaseFilter {
 
         LoggerUtility.d(clazz, "requestId: [%s]");
 
-        MDC.put(SecurityConstants.REQUEST_ID, requestId);
-        request.setAttribute(SecurityConstants.REQUEST_ID, requestId);
-        response.setHeader(SecurityConstants.REQUEST_ID, requestId);
+        MDC.put(SecurityConstants.HttpHeaders.REQUEST_ID, requestId);
+        request.setAttribute(SecurityConstants.HttpHeaders.REQUEST_ID, requestId);
+        response.setHeader(SecurityConstants.HttpHeaders.REQUEST_ID, requestId);
     }
 
     @Override
     protected void afterRequest() {
-        MDC.remove(SecurityConstants.REQUEST_ID);
+        MDC.remove(SecurityConstants.HttpHeaders.REQUEST_ID);
     }
 }

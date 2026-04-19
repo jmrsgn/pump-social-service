@@ -11,6 +11,8 @@ import org.springframework.web.client.RestClient;
 import com.johnmartin.social.constants.SecurityConstants;
 import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.constants.api.ApiConstants;
+import com.johnmartin.social.constants.error.AuthErrorConstants;
+import com.johnmartin.social.constants.error.ExternalServiceErrorConstants;
 import com.johnmartin.social.dto.internal.AuthUserResponse;
 import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.exception.UnauthorizedException;
@@ -30,18 +32,20 @@ public class AuthServiceClient {
             Result<AuthUserResponse> result = authWebClient.post()
                                                            .uri(ApiConstants.PumpAuthService.API_VALIDATE)
                                                            .header(HttpHeaders.AUTHORIZATION, authorizationHeader)
-                                                           .header(SecurityConstants.REQUEST_ID, requestId)
+                                                           .header(SecurityConstants.HttpHeaders.REQUEST_ID, requestId)
                                                            .retrieve()
                                                            .body(new ParameterizedTypeReference<>() {
                                                            });
 
             if (result == null || result.getData().isEmpty()) {
-                throw new RuntimeException("Auth user not found");
+                throw new RuntimeException(ExternalServiceErrorConstants.AUTH_USER_NOT_FOUND);
             }
 
             return result.getData().get();
         } catch (HttpClientErrorException.Unauthorized ex) {
-            throw new UnauthorizedException("Invalid token");
+            throw new UnauthorizedException(AuthErrorConstants.USER_IS_NOT_AUTHENTICATED_OR_INVALID_TOKEN);
+        } catch (Exception ex) {
+            throw new RuntimeException(ExternalServiceErrorConstants.FAILED_TO_VALIDATE_CURRENT_USER);
         }
     }
 }

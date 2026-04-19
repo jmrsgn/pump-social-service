@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.johnmartin.social.constants.error.PostErrorConstants;
+import com.johnmartin.social.constants.error.SystemErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.CreatePostRequest;
 import com.johnmartin.social.dto.response.PostResponse;
@@ -50,7 +52,7 @@ public class PostService {
 
         if (request == null) {
             LoggerUtility.d(clazz, "Request is null, will not proceed method call");
-            throw new BadRequestException("Invalid request");
+            throw new BadRequestException(SystemErrorConstants.INVALID_REQUEST);
         }
 
         // Get auth user
@@ -107,7 +109,8 @@ public class PostService {
      * @return PostEntity or null
      */
     public PostEntity getPostById(String postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new NotFoundException("Post not found"));
+        return postRepository.findById(postId)
+                             .orElseThrow(() -> new NotFoundException(PostErrorConstants.POST_NOT_FOUND));
     }
 
     /**

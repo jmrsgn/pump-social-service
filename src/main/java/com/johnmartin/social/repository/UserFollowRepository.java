@@ -17,7 +17,7 @@ public interface UserFollowRepository extends MongoRepository<UserFollowEntity, 
 
     List<UserFollowEntity> findByFollowingId(String followingId); // users who follow me
 
-    // 🔹 Feed optimization (only fetch IDs, not full documents)
+    // Feed optimization (only fetch IDs, not full documents)
     @Query(value = "{ 'followerId': ?0 }", fields = "{ 'followingId': 1, '_id': 0 }")
     List<UserFollowEntity> findFollowingIds(String followerId);
 
