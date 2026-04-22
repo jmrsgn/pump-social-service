@@ -44,7 +44,7 @@ public class UserService {
     public UserResponse createUser(CreateUserRequest request) {
         LoggerUtility.d(clazz, "Execute method: [createUser]");
         UserEntity userEntity = new UserEntity();
-        userEntity.setId(request.id());
+        userEntity.setId(request.userId());
         userEntity.setFirstName(request.firstName());
         userEntity.setLastName(request.lastName());
         userEntity.setEmail(request.email());
