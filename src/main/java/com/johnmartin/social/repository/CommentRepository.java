@@ -3,6 +3,7 @@ package com.johnmartin.social.repository;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -24,4 +25,8 @@ public interface CommentRepository extends MongoRepository<CommentEntity, String
     List<CommentEntity> findByPostIdOrderByCreatedAtDesc(String postId);
 
     List<CommentEntity> findByPostIdInOrderByCreatedAtDesc(List<String> postIds);
+
+    Page<CommentEntity> findByPostIdAndParentCommentIdIsNullOrderByCreatedAtDesc(String postId, Pageable pageable);
+
+    Page<CommentEntity> findByParentCommentIdOrderByCreatedAtAsc(String parentCommentId, Pageable pageable);
 }

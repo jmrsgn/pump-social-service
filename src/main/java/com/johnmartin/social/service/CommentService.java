@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.UIConstants;
@@ -239,18 +241,6 @@ public class CommentService {
     }
 
     /**
-     * Get comment by ID
-     *
-     * @param commentId
-     *            - Comment ID
-     * @return CommentEntity
-     */
-    private CommentEntity getCommentById(String commentId) {
-        LoggerUtility.d(clazz, String.format("Execute method: [getCommentById] commentId: [%s]", commentId));
-        return commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("Comment not found"));
-    }
-
-    /**
      * Get latest comments of all posts
      * 
      * @param postIds
@@ -286,5 +276,45 @@ public class CommentService {
                                                                                    list -> list.stream()
                                                                                                .limit(UIConstants.MINIMUM_COMMENTS_PER_POST)
                                                                                                .toList())));
+    }
+
+    /**
+     * Get top level comments
+     * 
+     * @param postId
+     *            - Post ID
+     * @param pageable
+     *            - Pageable
+     * @return Page<CommentEntity>
+     */
+    public Page<CommentEntity> getTopLevelComments(String postId, Pageable pageable) {
+        LoggerUtility.d(clazz, String.format("Execute method: [getTopLevelComments] postId: [%s]", postId));
+        return commentRepository.findByPostIdAndParentCommentIdIsNullOrderByCreatedAtDesc(postId, pageable);
+    }
+
+    /**
+     * Get replies from comment
+     *
+     * @param commentId
+     *            - Comment ID
+     * @param pageable
+     *            - Pageable
+     * @return Page<CommentEntity>
+     */
+    public Page<CommentEntity> getReplies(String commentId, Pageable pageable) {
+        LoggerUtility.d(clazz, String.format("Execute method: [getReplies] commentId: [%s]", commentId));
+        return commentRepository.findByParentCommentIdOrderByCreatedAtAsc(commentId, pageable);
+    }
+
+    /**
+     * Get comment by comment ID
+     *
+     * @param commentId
+     *            - Comment ID
+     * @return CommentEntity or null
+     */
+    public CommentEntity getCommentById(String commentId) {
+        return commentRepository.findById(commentId)
+                                .orElseThrow(() -> new NotFoundException(CommentErrorConstants.COMMENT_NOT_FOUND));
     }
 }

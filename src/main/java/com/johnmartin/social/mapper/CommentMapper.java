@@ -15,6 +15,7 @@ public class CommentMapper {
         return new CommentResponse(comment.getId(),
                                    comment.getComment(),
                                    comment.getPostId(),
+                                   comment.getParentCommentId(),
                                    socialUser.getFirstName() + " " + socialUser.getLastName(),
                                    socialUser.getProfileImageUrl(),
                                    comment.getLikesCount(),

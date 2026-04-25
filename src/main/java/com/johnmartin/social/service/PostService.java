@@ -27,16 +27,11 @@ public class PostService {
     private final PostRepository postRepository;
 
     private final UserService userService;
-    private final PostLikeService postLikeService;
     private final AuthService authService;
 
-    public PostService(PostRepository postRepository,
-                       UserService userService,
-                       PostLikeService postLikeService,
-                       AuthService authService) {
+    public PostService(PostRepository postRepository, UserService userService, AuthService authService) {
         this.postRepository = postRepository;
         this.userService = userService;
-        this.postLikeService = postLikeService;
         this.authService = authService;
     }
 

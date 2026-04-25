@@ -13,15 +13,18 @@ import org.springframework.stereotype.Service;
 import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.constants.error.SystemErrorConstants;
+import com.johnmartin.social.constants.error.domain.CommentErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.UpdatePostRequest;
 import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.dto.response.PostResponse;
 import com.johnmartin.social.dto.response.common.PagedResponse;
+import com.johnmartin.social.entities.CommentEntity;
 import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.UserEntity;
 import com.johnmartin.social.exception.BadRequestException;
 import com.johnmartin.social.exception.UnauthorizedException;
+import com.johnmartin.social.mapper.CommentMapper;
 import com.johnmartin.social.mapper.PostMapper;
 import com.johnmartin.social.service.*;
 import com.johnmartin.social.utilities.LoggerUtility;
@@ -36,17 +39,20 @@ public class PostCommentFacade {
     private final PostService postService;
     private final CommentService commentService;
     private final PostLikeService postLikeService;
+    private final CommentLikeService commentLikeService;
     private final UserService userService;
     private final AuthService authService;
 
     public PostCommentFacade(PostService postService,
                              CommentService commentService,
                              PostLikeService postLikeService,
+                             CommentLikeService commentLikeService,
                              UserService userService,
                              AuthService authService) {
         this.postService = postService;
         this.commentService = commentService;
         this.postLikeService = postLikeService;
+        this.commentLikeService = commentLikeService;
         this.userService = userService;
         this.authService = authService;
     }
@@ -241,5 +247,116 @@ public class PostCommentFacade {
                                      comments.getOrDefault(postId, Collections.emptyList()),
                                      socialUser,
                                      isLiked);
+    }
+
+    /**
+     * Get Top-level comments in a post
+     *
+     * @param postId
+     *            - Post ID
+     * @param page
+     *            - page
+     * @return PagedResponse<CommentResponse>
+     */
+    public PagedResponse<CommentResponse> getTopLevelComments(String postId, int page) {
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [getTopLevelComments] postId: [%s] page: [%s]", postId, page));
+
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
+
+        PageRequest pageRequest = PageRequest.of(page, UIConstants.MINIMUM_COMMENTS_PER_POST);
+
+        Page<CommentEntity> pageResult = commentService.getTopLevelComments(postId, pageRequest);
+
+        List<CommentEntity> comments = pageResult.getContent();
+        LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
+
+        if (CollectionUtils.isEmpty(comments)) {
+            return new PagedResponse<>(Collections.emptyList(),
+                                       page,
+                                       UIConstants.MINIMUM_COMMENTS_PER_POST,
+                                       0,
+                                       0,
+                                       false);
+        }
+
+        List<String> ids = comments.stream().map(CommentEntity::getId).toList();
+        Set<String> likedIds = commentLikeService.getLikedCommentIds(ids, authUser.id());
+
+        // Get social user
+        UserEntity socialUser = userService.findById(authUser.id());
+        List<CommentResponse> response = comments.stream()
+                                                 .map(c -> CommentMapper.toResponse(c,
+                                                                                    socialUser,
+                                                                                    likedIds.contains(c.getId())))
+                                                 .toList();
+
+        return new PagedResponse<>(response,
+                                   pageResult.getNumber(),
+                                   pageResult.getSize(),
+                                   pageResult.getTotalElements(),
+                                   pageResult.getTotalPages(),
+                                   pageResult.hasNext());
+    }
+
+    /**
+     * Get replies in a comment
+     * 
+     * @param postId
+     *            - Post ID
+     * @param commentId
+     *            - Comment ID
+     * @param page
+     *            - page
+     * @return PagedResponse<CommentResponse>
+     */
+    public PagedResponse<CommentResponse> getReplies(String postId, String commentId, int page) {
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [getReplies] postId: [%s] commentId: [%s] page: [%s]",
+                                      postId,
+                                      commentId,
+                                      page));
+
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
+
+        // Validate ownership
+        CommentEntity parent = commentService.getCommentById(commentId);
+
+        if (!parent.getPostId().equals(postId)) {
+            throw new BadRequestException(CommentErrorConstants.THE_COMMENT_DOES_NOT_BELONG_TO_THE_SPECIFIED_POST);
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, UIConstants.MINIMUM_REPLIES_PER_COMMENT);
+        Page<CommentEntity> pageResult = commentService.getReplies(commentId, pageRequest);
+        List<CommentEntity> replies = pageResult.getContent();
+
+        if (CollectionUtils.isEmpty(replies)) {
+            return new PagedResponse<>(Collections.emptyList(),
+                                       page,
+                                       UIConstants.MINIMUM_REPLIES_PER_COMMENT,
+                                       0,
+                                       0,
+                                       false);
+        }
+
+        List<String> ids = replies.stream().map(CommentEntity::getId).toList();
+        Set<String> likedIds = commentLikeService.getLikedCommentIds(ids, authUser.id());
+
+        // Get social user
+        UserEntity socialUser = userService.findById(authUser.id());
+        List<CommentResponse> response = replies.stream()
+                                                .map(c -> CommentMapper.toResponse(c,
+                                                                                   socialUser,
+                                                                                   likedIds.contains(c.getId())))
+                                                .toList();
+
+        return new PagedResponse<>(response,
+                                   pageResult.getNumber(),
+                                   pageResult.getSize(),
+                                   pageResult.getTotalElements(),
+                                   pageResult.getTotalPages(),
+                                   pageResult.hasNext());
     }
 }
