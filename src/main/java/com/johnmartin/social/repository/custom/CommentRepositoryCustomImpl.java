@@ -27,4 +27,16 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         Update update = new Update().inc(CommentEntityConstants.COLUMN_LIKES_COUNT, -1);
         mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(commentId)), update, CommentEntity.class);
     }
+
+    @Override
+    public void incrementRepliesCount(String commentId) {
+        Update update = new Update().inc(CommentEntityConstants.COLUMN_REPLIES_COUNT, 1);
+        mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(commentId)), update, CommentEntity.class);
+    }
+
+    @Override
+    public void decrementRepliesCount(String commentId) {
+        Update update = new Update().inc(CommentEntityConstants.COLUMN_REPLIES_COUNT, -1);
+        mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(commentId)), update, CommentEntity.class);
+    }
 }

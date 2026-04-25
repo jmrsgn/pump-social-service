@@ -61,9 +61,12 @@ public class CommentService {
      *            - comment
      * @return CommentResponse
      */
-    public CommentResponse createComment(String postId, String comment) {
+    public CommentResponse createComment(String postId, String comment, String parentCommentId) {
         LoggerUtility.d(clazz,
-                        String.format("Execute method: [createComment] postId: [%s] comment: [%s]", postId, comment));
+                        String.format("Execute method: [createComment] postId: [%s] parentCommentId: [%s] comment: [%s]",
+                                      postId,
+                                      parentCommentId,
+                                      comment));
 
         // Get auth user
         AuthUser authUser = authService.getAuthUser();
@@ -76,6 +79,7 @@ public class CommentService {
         createdComment.setComment(comment);
         createdComment.setAuthorId(authUser.id());
         createdComment.setPostId(post.getId());
+        createdComment.setParentCommentId(parentCommentId);
         createdComment.setLikesCount(0);
         createdComment.setRepliesCount(0);
 
@@ -85,13 +89,66 @@ public class CommentService {
         CommentEntity savedComment = commentRepository.save(createdComment);
         LoggerUtility.t(clazz, String.format("savedComment: [%s]", savedComment));
 
-        // Increment comments count of that post
-        postService.incrementCommentsCount(savedComment.getPostId());
+        // If parentCommentId, the comment is the top-level comment
+        if (parentCommentId == null) {
+            // Increment comments count of post
+            postService.incrementCommentsCount(postId);
+        } else {
+            // reply
+            incrementRepliesCount(parentCommentId);
+        }
 
-        boolean isLiked = commentLikeService.isCommentLikedByUser(savedComment.getId(), authUser.id());
         // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
-        return CommentMapper.toResponse(savedComment, socialUser, isLiked);
+        return CommentMapper.toResponse(savedComment, socialUser, false);
+    }
+
+    /**
+     * Create a reply under a comment
+     * 
+     * @param postId
+     *            - Post ID
+     * @param commentId
+     *            - Parent comment ID
+     * @param comment
+     *            - Comment
+     * @return CommentResponse
+     */
+    public CommentResponse createReply(String postId, String commentId, String comment) {
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [createReply] postId: [%s] commentId: [%s] comment: [%s]",
+                                      postId,
+                                      commentId,
+                                      comment));
+
+        // Get parent comment
+        CommentEntity parentComment = getCommentById(commentId);
+
+        // Check if comment belongs to the post
+        if (!parentComment.getPostId().equals(postId)) {
+            throw new BadRequestException(CommentErrorConstants.THE_COMMENT_DOES_NOT_BELONG_TO_THE_SPECIFIED_POST);
+        }
+
+        // If replying to something that is already a reply, reject
+        if (parentComment.getParentCommentId() != null) {
+            throw new BadRequestException(CommentErrorConstants.NESTED_REPLIES_ARE_NOT_ALLOWED);
+        }
+
+        return createComment(parentComment.getPostId(), // safe source of truth
+                             comment,
+                             commentId // parentCommentId
+        );
+    }
+
+    /**
+     * Increment replies count
+     *
+     * @param commentId
+     *            - Comment ID
+     */
+    public void incrementRepliesCount(String commentId) {
+        LoggerUtility.d(clazz, String.format("Execute method: [incrementRepliesCount] commentId: [%s]", commentId));
+        commentRepository.incrementRepliesCount(commentId);
     }
 
     /**

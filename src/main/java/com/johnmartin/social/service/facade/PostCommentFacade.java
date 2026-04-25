@@ -140,18 +140,17 @@ public class PostCommentFacade {
         // Get auth user
         AuthUser authUser = authService.getAuthUser();
 
-        // Get post
-        PostEntity post = postService.getPostById(postId);
-        LoggerUtility.t(clazz, String.format("post: [%s]", post));
-
         // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
         // Get comments of liked post
-        Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
+        Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(postId),
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
-        boolean isLiked = postLikeService.toggleLike(post.getId(), authUser.id());
+        boolean isLiked = postLikeService.toggleLike(postId, authUser.id());
+
+        // Get updated post info
+        PostEntity post = postService.getPostById(postId);
         return PostMapper.toResponse(post, comments.getOrDefault(postId, Collections.emptyList()), socialUser, isLiked);
     }
 

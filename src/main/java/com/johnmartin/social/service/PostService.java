@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.constants.error.domain.PostErrorConstants;
 import com.johnmartin.social.constants.error.SystemErrorConstants;
+import com.johnmartin.social.constants.error.domain.PostErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.CreatePostRequest;
 import com.johnmartin.social.dto.response.PostResponse;
@@ -75,8 +75,7 @@ public class PostService {
 
         // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
-        boolean isLiked = postLikeService.isPostLikedByUser(post.getId(), authUser.id());
-        return PostMapper.toResponse(post, Collections.emptyList(), socialUser, isLiked);
+        return PostMapper.toResponse(post, Collections.emptyList(), socialUser, false);
     }
 
     /**

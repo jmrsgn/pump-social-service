@@ -27,8 +27,16 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<Result<CommentResponse>> createComment(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = ValidationErrorConstants.POST_ID_IS_REQUIRED) String postId,
                                                                  @RequestBody @NotBlank(message = ValidationErrorConstants.COMMENT_IS_REQUIRED) String comment) {
-        CommentResponse createdComment = commentService.createComment(postId, comment);
+        CommentResponse createdComment = commentService.createComment(postId, comment, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(createdComment));
+    }
+
+    @PostMapping(ApiConstants.Path.COMMENT_REPLIES)
+    public ResponseEntity<Result<CommentResponse>> createReply(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = ValidationErrorConstants.POST_ID_IS_REQUIRED) String postId,
+                                                               @PathVariable(ApiConstants.Params.COMMENT_ID) @NotBlank(message = ValidationErrorConstants.COMMENT_ID_IS_REQUIRED) String commentId,
+                                                               @RequestBody @NotBlank(message = ValidationErrorConstants.COMMENT_IS_REQUIRED) String comment) {
+        CommentResponse createdReply = commentService.createReply(postId, commentId, comment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(createdReply));
     }
 
     @DeleteMapping(ApiConstants.Path.COMMENT_INFO)

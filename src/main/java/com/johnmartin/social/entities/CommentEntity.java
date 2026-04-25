@@ -26,6 +26,8 @@ public class CommentEntity {
     private String authorId;
     @Field(name = CommentEntityConstants.COLUMN_POST_ID)
     private String postId;
+    @Field(name = CommentEntityConstants.COLUMN_PARENT_COMMENT_ID)
+    private String parentCommentId; // nullable
 
     @Field(name = CommentEntityConstants.COLUMN_LIKES_COUNT)
     private int likesCount;

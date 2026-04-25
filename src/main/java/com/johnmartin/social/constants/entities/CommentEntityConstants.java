@@ -9,6 +9,7 @@ public final class CommentEntityConstants {
     public static final String COLUMN_COMMENT = "comment";
     public static final String COLUMN_AUTHOR_ID = "author_id";
     public static final String COLUMN_POST_ID = "post_id";
+    public static final String COLUMN_PARENT_COMMENT_ID = "parent_comment_id";
     public static final String COLUMN_LIKES_COUNT = "likes_count";
     public static final String COLUMN_REPLIES_COUNT = "replies_count";
     public static final String COLUMN_CREATED_AT = "created_at";
