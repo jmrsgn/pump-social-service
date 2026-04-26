@@ -26,7 +26,7 @@ public interface CommentRepository extends MongoRepository<CommentEntity, String
 
     List<CommentEntity> findByPostIdInOrderByCreatedAtDesc(List<String> postIds);
 
-    Page<CommentEntity> findByPostIdAndParentCommentIdIsNullOrderByCreatedAtDesc(String postId, Pageable pageable);
+    Page<CommentEntity> findByPostIdAndParentCommentIdIsNullOrderByCreatedAtAsc(String postId, Pageable pageable);
 
     Page<CommentEntity> findByParentCommentIdOrderByCreatedAtAsc(String parentCommentId, Pageable pageable);
 }

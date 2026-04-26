@@ -289,7 +289,7 @@ public class CommentService {
      */
     public Page<CommentEntity> getTopLevelComments(String postId, Pageable pageable) {
         LoggerUtility.d(clazz, String.format("Execute method: [getTopLevelComments] postId: [%s]", postId));
-        return commentRepository.findByPostIdAndParentCommentIdIsNullOrderByCreatedAtDesc(postId, pageable);
+        return commentRepository.findByPostIdAndParentCommentIdIsNullOrderByCreatedAtAsc(postId, pageable);
     }
 
     /**
