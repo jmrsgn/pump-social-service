@@ -69,8 +69,8 @@ public class PostService {
         LoggerUtility.t(clazz, String.format("post after saving: [%s]", post));
 
         // Get social user
-        UserEntity socialUser = userService.findById(authUser.id());
-        return PostMapper.toResponse(post, Collections.emptyList(), socialUser, false);
+        UserEntity postAuthor = userService.findById(post.getAuthorId());
+        return PostMapper.toResponse(post, Collections.emptyList(), postAuthor, false, true);
     }
 
     /**

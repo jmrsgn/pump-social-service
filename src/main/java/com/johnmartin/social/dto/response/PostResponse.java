@@ -22,5 +22,6 @@ public record PostResponse(String id,
                            Instant createdAt,
                            Instant updatedAt,
 
-                           boolean isLikedByCurrentUser) {
+                           boolean isLikedByCurrentUser,
+                           boolean isOwnedByCurrentUser) {
 }

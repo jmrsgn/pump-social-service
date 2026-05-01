@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
@@ -89,13 +90,34 @@ public class PostCommentFacade {
                                                                                                       socialUser);
         // Get likedPostIds
         Set<String> likedPostIds = postLikeService.getLikedPostIds(postIds, socialUser.getId());
-        List<PostResponse> postResponseList = posts.stream()
-                                                   .map(post -> PostMapper.toResponse(post,
-                                                                                      commentsByPost.getOrDefault(post.getId(),
-                                                                                                                  Collections.emptyList()),
-                                                                                      socialUser,
-                                                                                      likedPostIds.contains(post.getId())))
-                                                   .toList();
+
+        // Get authorIds
+        Set<String> authorIds = posts.stream().map(PostEntity::getAuthorId).collect(Collectors.toSet());
+        // Get users tied to authorIds
+        Map<String, UserEntity> usersById = userService.findByIdIn(authorIds.stream().toList())
+                                                       .stream()
+                                                       .collect(Collectors.toMap(UserEntity::getId, u -> u));
+        // Prepare post response list
+        List<PostResponse> postResponseList = posts.stream().map(post -> {
+            UserEntity author = usersById.get(post.getAuthorId());
+            boolean isLikedByCurrentUser = likedPostIds.contains(post.getId());
+            boolean isOwnedByCurrentUser = socialUser.getId().equals(post.getAuthorId());
+
+            LoggerUtility.d(clazz,
+                            String.format("author: [%s] isLikedByCurrentUser: [%s] isOwnedByCurrentUser: [%s]",
+                                          author,
+                                          isLikedByCurrentUser,
+                                          isOwnedByCurrentUser));
+
+            return PostMapper.toResponse(post,
+                                         commentsByPost.getOrDefault(post.getId(), Collections.emptyList()),
+                                         author,
+                                         isLikedByCurrentUser,
+                                         isOwnedByCurrentUser);
+        }).toList();
+
+        LoggerUtility.d(clazz, String.format("postResponseList size: [%s]", postResponseList.size()));
+
         return new PagedResponse<>(postResponseList,
                                    postPage.getNumber(),
                                    postPage.getSize(),
@@ -126,11 +148,15 @@ public class PostCommentFacade {
         Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(post.getId()),
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
-        boolean isLiked = postLikeService.isPostLikedByUser(postId, socialUser.getId());
+
+        boolean isLikedByCurrentUser = postLikeService.isPostLikedByUser(postId, socialUser.getId());
+        boolean isOwnedByCurrentUser = socialUser.getId().equals(post.getAuthorId());
+
         return PostMapper.toResponse(post,
                                      comments.getOrDefault(post.getId(), Collections.emptyList()),
                                      socialUser,
-                                     isLiked);
+                                     isLikedByCurrentUser,
+                                     isOwnedByCurrentUser);
     }
 
     /**
@@ -153,11 +179,18 @@ public class PostCommentFacade {
                                                                                                 socialUser);
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
-        boolean isLiked = postLikeService.toggleLike(postId, authUser.id());
+        boolean isLikedByCurrentUser = postLikeService.toggleLike(postId, authUser.id());
 
         // Get updated post info
         PostEntity post = postService.getPostById(postId);
-        return PostMapper.toResponse(post, comments.getOrDefault(postId, Collections.emptyList()), socialUser, isLiked);
+
+        boolean isOwnedByCurrentUser = socialUser.getId().equals(post.getAuthorId());
+
+        return PostMapper.toResponse(post,
+                                     comments.getOrDefault(postId, Collections.emptyList()),
+                                     socialUser,
+                                     isLikedByCurrentUser,
+                                     isOwnedByCurrentUser);
     }
 
     /**
@@ -242,11 +275,14 @@ public class PostCommentFacade {
         PostEntity updatedPost = postService.savePost(post);
         LoggerUtility.t(clazz, String.format("updatedPost: [%s]", updatedPost));
 
-        boolean isLiked = postLikeService.isPostLikedByUser(postId, authUser.id());
+        boolean isLikedByCurrentUser = postLikeService.isPostLikedByUser(postId, authUser.id());
+        boolean isOwnedByCurrentUser = socialUser.getId().equals(post.getAuthorId());
+
         return PostMapper.toResponse(updatedPost,
                                      comments.getOrDefault(postId, Collections.emptyList()),
                                      socialUser,
-                                     isLiked);
+                                     isLikedByCurrentUser,
+                                     isOwnedByCurrentUser);
     }
 
     /**
@@ -281,16 +317,24 @@ public class PostCommentFacade {
                                        false);
         }
 
-        List<String> ids = comments.stream().map(CommentEntity::getId).toList();
-        Set<String> likedIds = commentLikeService.getLikedCommentIds(ids, authUser.id());
-
+        // Get authorIds
+        Set<String> authorIds = comments.stream().map(CommentEntity::getAuthorId).collect(Collectors.toSet());
+        // Get users tied to authorIds
+        Map<String, UserEntity> usersById = userService.findByIdIn(authorIds.stream().toList())
+                                                       .stream()
+                                                       .collect(Collectors.toMap(UserEntity::getId, u -> u));
+        // Extract all comments's id
+        List<String> commentIds = comments.stream().map(CommentEntity::getId).toList();
         // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
-        List<CommentResponse> response = comments.stream()
-                                                 .map(c -> CommentMapper.toResponse(c,
-                                                                                    socialUser,
-                                                                                    likedIds.contains(c.getId())))
-                                                 .toList();
+        // Get likedCommentIds
+        Set<String> likedCommentIds = commentLikeService.getLikedCommentIds(commentIds, socialUser.getId());
+
+        List<CommentResponse> response = comments.stream().map(comment -> {
+            UserEntity author = usersById.get(comment.getAuthorId());
+            boolean isLikedByCurrentUser = likedCommentIds.contains(comment.getId());
+            return CommentMapper.toResponse(comment, author, isLikedByCurrentUser);
+        }).toList();
 
         return new PagedResponse<>(response,
                                    pageResult.getNumber(),
@@ -341,16 +385,25 @@ public class PostCommentFacade {
                                        false);
         }
 
-        List<String> ids = replies.stream().map(CommentEntity::getId).toList();
-        Set<String> likedIds = commentLikeService.getLikedCommentIds(ids, authUser.id());
-
         // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
-        List<CommentResponse> response = replies.stream()
-                                                .map(c -> CommentMapper.toResponse(c,
-                                                                                   socialUser,
-                                                                                   likedIds.contains(c.getId())))
-                                                .toList();
+        // Extract all comments's id
+        List<String> commentIds = replies.stream().map(CommentEntity::getId).toList();
+        // Get likedCommentIds
+        Set<String> likedCommentIds = commentLikeService.getLikedCommentIds(commentIds, socialUser.getId());
+
+        // Get authorIds
+        Set<String> authorIds = replies.stream().map(CommentEntity::getAuthorId).collect(Collectors.toSet());
+        // Get users tied to authorIds
+        Map<String, UserEntity> usersById = userService.findByIdIn(authorIds.stream().toList())
+                                                       .stream()
+                                                       .collect(Collectors.toMap(UserEntity::getId, u -> u));
+
+        List<CommentResponse> response = replies.stream().map(comment -> {
+            UserEntity author = usersById.get(comment.getAuthorId());
+            boolean isLikedByCurrentUser = likedCommentIds.contains(comment.getId());
+            return CommentMapper.toResponse(comment, author, isLikedByCurrentUser);
+        }).toList();
 
         return new PagedResponse<>(response,
                                    pageResult.getNumber(),

@@ -246,31 +246,36 @@ public class CommentService {
      * @param postIds
      *            - Post IDs
      * @param socialUser
-     *            - Social user
+     *            - Social User
      * @return Map<String, List<CommentResponse>>
      */
     public Map<String, List<CommentResponse>> getLatestCommentsByPostIds(List<String> postIds, UserEntity socialUser) {
-        LoggerUtility.d(clazz,
-                        String.format("Execute method: [getLatestCommentsByPostIds] postIds: [%s] socialUser: [%s]",
-                                      postIds,
-                                      socialUser));
+        LoggerUtility.d(clazz, String.format("Execute method: [getLatestCommentsByPostIds] postIds: [%s]", postIds));
 
         // Get latest comments
         List<CommentEntity> comments = commentRepository.findByPostIdInOrderByCreatedAtDesc(postIds);
+
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
         if (CollectionUtils.isEmpty(comments)) {
             return new HashMap<>();
         }
 
+        // Get authorIds
+        Set<String> authorIds = comments.stream().map(CommentEntity::getAuthorId).collect(Collectors.toSet());
+        // Get users tied to authorIds
+        Map<String, UserEntity> usersById = userService.findByIdIn(authorIds.stream().toList())
+                                                       .stream()
+                                                       .collect(Collectors.toMap(UserEntity::getId, u -> u));
         // Extract all comments's id
         List<String> commentIds = comments.stream().map(CommentEntity::getId).toList();
         // Get likedCommentIds
-        Set<String> likedPostIds = commentLikeService.getLikedCommentIds(commentIds, socialUser.getId());
-        return comments.stream()
-                       .map(comment -> CommentMapper.toResponse(comment,
-                                                                socialUser,
-                                                                likedPostIds.contains(comment.getId())))
+        Set<String> likedCommentIds = commentLikeService.getLikedCommentIds(commentIds, socialUser.getId());
+        return comments.stream().map(comment -> {
+            UserEntity author = usersById.get(comment.getAuthorId());
+            boolean isLikedByCurrentUser = likedCommentIds.contains(comment.getId());
+            return CommentMapper.toResponse(comment, author, isLikedByCurrentUser);
+        })
                        .collect(Collectors.groupingBy(CommentResponse::postId,
                                                       Collectors.collectingAndThen(Collectors.toList(),
                                                                                    list -> list.stream()

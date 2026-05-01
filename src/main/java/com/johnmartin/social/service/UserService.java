@@ -1,5 +1,7 @@
 package com.johnmartin.social.service;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,11 @@ public class UserService {
         LoggerUtility.d(clazz, "Execute method: [findById]");
         return userRepository.findById(userId)
                              .orElseThrow(() -> new NotFoundException(UserErrorConstants.USER_NOT_FOUND));
+    }
+
+    public List<UserEntity> findByIdIn(List<String> userIds) {
+        LoggerUtility.d(clazz, "Execute method: [findByIdIn]");
+        return userRepository.findByIdIn(userIds);
     }
 
     public UserResponse getUserById(String userId) {

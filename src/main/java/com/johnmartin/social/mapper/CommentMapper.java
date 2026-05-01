@@ -10,14 +10,14 @@ public class CommentMapper {
     }
 
     public static CommentResponse toResponse(CommentEntity comment,
-                                             UserEntity socialUser,
+                                             UserEntity commentAuthor,
                                              boolean isLikedByCurrentUser) {
         return new CommentResponse(comment.getId(),
                                    comment.getComment(),
                                    comment.getPostId(),
                                    comment.getParentCommentId(),
-                                   socialUser.getFirstName() + " " + socialUser.getLastName(),
-                                   socialUser.getProfileImageUrl(),
+                                   commentAuthor.getFirstName() + " " + commentAuthor.getLastName(),
+                                   commentAuthor.getProfileImageUrl(),
                                    comment.getLikesCount(),
                                    comment.getRepliesCount(),
                                    comment.getCreatedAt(),
