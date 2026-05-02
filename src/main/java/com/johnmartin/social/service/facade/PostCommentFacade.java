@@ -203,13 +203,6 @@ public class PostCommentFacade {
         // Get auth user
         AuthUser authUser = authService.getAuthUser();
 
-        // Get social user
-        UserEntity socialUser = userService.findById(authUser.id());
-        // Get comments of liked post
-        Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(postId),
-                                                                                                socialUser);
-        LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
-
         boolean isLikedByCurrentUser = postLikeService.toggleLike(postId, authUser.id());
         LoggerUtility.d(clazz, String.format("isLikedByCurrentUser: [%s]", isLikedByCurrentUser));
 
@@ -217,12 +210,21 @@ public class PostCommentFacade {
         PostEntity post = postService.getPostById(postId);
         LoggerUtility.d(clazz, String.format("post: [%s]", post));
 
+        // Get social user
+        UserEntity socialUser = userService.findById(authUser.id());
         boolean isOwnedByCurrentUser = socialUser.getId().equals(post.getAuthorId());
         LoggerUtility.d(clazz, String.format("isOwnedByCurrentUser: [%s]", isOwnedByCurrentUser));
 
+        // Get comments of liked post
+        Map<String, List<CommentResponse>> comments = commentService.getLatestCommentsByPostIds(Collections.singletonList(postId),
+                                                                                                socialUser);
+        LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
+
+        // Get post author
+        UserEntity postAuthor = userService.findById(post.getAuthorId());
         return PostMapper.toResponse(post,
                                      comments.getOrDefault(postId, Collections.emptyList()),
-                                     socialUser,
+                                     postAuthor,
                                      isLikedByCurrentUser,
                                      isOwnedByCurrentUser);
     }
