@@ -11,7 +11,6 @@ import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.dto.response.common.PagedResponse;
 import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.service.CommentService;
-import com.johnmartin.social.service.facade.PostCommentFacade;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -22,17 +21,15 @@ import jakarta.validation.constraints.PositiveOrZero;
 public class CommentController {
 
     private final CommentService commentService;
-    private final PostCommentFacade postCommentFacade;
 
-    public CommentController(CommentService commentService, PostCommentFacade postCommentFacade) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
-        this.postCommentFacade = postCommentFacade;
     }
 
     @GetMapping
     public ResponseEntity<Result<PagedResponse<CommentResponse>>> getComments(@PathVariable(ApiConstants.Params.POST_ID) @NotBlank(message = ValidationErrorConstants.POST_ID_IS_REQUIRED) String postId,
                                                                               @RequestParam(defaultValue = "0") @PositiveOrZero int page) {
-        PagedResponse<CommentResponse> comments = postCommentFacade.getTopLevelComments(postId, page);
+        PagedResponse<CommentResponse> comments = commentService.getTopLevelComments(postId, page);
         return ResponseEntity.ok(Result.success(comments));
     }
 
@@ -40,7 +37,7 @@ public class CommentController {
     public ResponseEntity<Result<PagedResponse<CommentResponse>>> getReplies(@PathVariable(ApiConstants.Params.POST_ID) String postId,
                                                                              @PathVariable(ApiConstants.Params.COMMENT_ID) String commentId,
                                                                              @RequestParam(defaultValue = "0") int page) {
-        return ResponseEntity.ok(Result.success(postCommentFacade.getReplies(postId, commentId, page)));
+        return ResponseEntity.ok(Result.success(commentService.getReplies(postId, commentId, page)));
     }
 
     @PostMapping

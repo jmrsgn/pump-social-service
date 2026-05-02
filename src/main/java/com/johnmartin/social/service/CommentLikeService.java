@@ -2,7 +2,6 @@ package com.johnmartin.social.service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -10,6 +9,7 @@ import com.johnmartin.social.entities.CommentLikeEntity;
 import com.johnmartin.social.repository.CommentLikeRepository;
 import com.johnmartin.social.repository.CommentRepository;
 import com.johnmartin.social.utilities.LoggerUtility;
+import com.johnmartin.social.utils.ExtractorUtils;
 
 import jakarta.transaction.Transactional;
 
@@ -53,10 +53,9 @@ public class CommentLikeService {
                         String.format("Execute method: [getLikedCommentIds]  commentIds: [%s] userId: [%s]",
                                       commentIds,
                                       userId));
-        return commentLikeRepository.findByUserIdAndCommentIdIn(userId, commentIds)
-                                    .stream()
-                                    .map(CommentLikeEntity::getCommentId)
-                                    .collect(Collectors.toSet());
+        List<CommentLikeEntity> likedCommentIds = commentLikeRepository.findByUserIdAndCommentIdIn(userId, commentIds);
+        LoggerUtility.d(clazz, String.format("likedCommentIds size: [%s]", likedCommentIds.size()));
+        return ExtractorUtils.extractToSet(likedCommentIds, CommentLikeEntity::getCommentId);
     }
 
     public boolean isCommentLikedByUser(String commentId, String userId) {

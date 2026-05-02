@@ -1,14 +1,12 @@
 package com.johnmartin.social.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.UIConstants;
@@ -16,6 +14,7 @@ import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.constants.error.domain.CommentErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.response.CommentResponse;
+import com.johnmartin.social.dto.response.common.PagedResponse;
 import com.johnmartin.social.entities.CommentEntity;
 import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.UserEntity;
@@ -26,6 +25,7 @@ import com.johnmartin.social.mapper.CommentMapper;
 import com.johnmartin.social.repository.CommentLikeRepository;
 import com.johnmartin.social.repository.CommentRepository;
 import com.johnmartin.social.utilities.LoggerUtility;
+import com.johnmartin.social.utils.ExtractorUtils;
 
 import jakarta.transaction.Transactional;
 
@@ -254,23 +254,42 @@ public class CommentService {
 
         // Get latest comments
         List<CommentEntity> comments = commentRepository.findByPostIdInOrderByCreatedAtDesc(postIds);
-
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
         if (CollectionUtils.isEmpty(comments)) {
+            LoggerUtility.d(clazz, "comments are empty");
             return new HashMap<>();
         }
 
         // Get authorIds
-        Set<String> authorIds = comments.stream().map(CommentEntity::getAuthorId).collect(Collectors.toSet());
+        Set<String> authorIds = ExtractorUtils.extractToSet(comments, CommentEntity::getAuthorId);
+        LoggerUtility.d(clazz, String.format("authorIds size: [%s]", authorIds.size()));
+
+        // Get authors
+        List<UserEntity> authors = userService.findByIdIn(authorIds.stream().toList());
+        LoggerUtility.d(clazz, String.format("authors size: [%s]", authors.size()));
+
         // Get users tied to authorIds
-        Map<String, UserEntity> usersById = userService.findByIdIn(authorIds.stream().toList())
-                                                       .stream()
-                                                       .collect(Collectors.toMap(UserEntity::getId, u -> u));
+        Map<String, UserEntity> usersById = ExtractorUtils.extractToMap(authors,
+                                                                        UserEntity::getId,
+                                                                        Function.identity());
+        LoggerUtility.d(clazz, String.format("usersById size: [%s]", usersById.size()));
+
         // Extract all comments's id
-        List<String> commentIds = comments.stream().map(CommentEntity::getId).toList();
+        List<String> commentIds = ExtractorUtils.extractToList(comments, CommentEntity::getId);
+        LoggerUtility.d(clazz, String.format("commentIds size: [%s]", commentIds.size()));
+
         // Get likedCommentIds
         Set<String> likedCommentIds = commentLikeService.getLikedCommentIds(commentIds, socialUser.getId());
+        LoggerUtility.d(clazz, String.format("likedCommentIds size: [%s]", likedCommentIds.size()));
+        return postProcessGetLatestCommentsByPostIds(comments, usersById, likedCommentIds);
+    }
+
+    private Map<String, List<CommentResponse>> postProcessGetLatestCommentsByPostIds(List<CommentEntity> comments,
+                                                                                     Map<String, UserEntity> usersById,
+                                                                                     Set<String> likedCommentIds) {
+        LoggerUtility.d(clazz, "Execute method: [postProcessGetLatestCommentsByPostIds]");
+
         return comments.stream().map(comment -> {
             UserEntity author = usersById.get(comment.getAuthorId());
             boolean isLikedByCurrentUser = likedCommentIds.contains(comment.getId());
@@ -284,31 +303,138 @@ public class CommentService {
     }
 
     /**
-     * Get top level comments
-     * 
+     * Get Top-level comments in a post
+     *
      * @param postId
      *            - Post ID
-     * @param pageable
-     *            - Pageable
-     * @return Page<CommentEntity>
+     * @param page
+     *            - page
+     * @return PagedResponse<CommentResponse>
      */
-    public Page<CommentEntity> getTopLevelComments(String postId, Pageable pageable) {
-        LoggerUtility.d(clazz, String.format("Execute method: [getTopLevelComments] postId: [%s]", postId));
-        return commentRepository.findByPostIdAndParentCommentIdIsNullOrderByCreatedAtAsc(postId, pageable);
+    public PagedResponse<CommentResponse> getTopLevelComments(String postId, int page) {
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [getTopLevelComments] postId: [%s] page: [%s]", postId, page));
+
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
+
+        // Get post
+        PostEntity post = postService.getPostById(postId);
+
+        // Get comments per page
+        PageRequest pageRequest = PageRequest.of(page, UIConstants.MINIMUM_COMMENTS_PER_POST);
+        Page<CommentEntity> toplevelCommentsPage = commentRepository.findByPostIdAndParentCommentIdIsNullOrderByCreatedAtAsc(post.getId(),
+                                                                                                                             pageRequest);
+        List<CommentEntity> topLevelComments = toplevelCommentsPage.getContent();
+        LoggerUtility.d(clazz, String.format("topLevelComments size: [%s]", topLevelComments.size()));
+
+        if (CollectionUtils.isEmpty(topLevelComments)) {
+            LoggerUtility.d(clazz, "topLevelComments are empty");
+            return new PagedResponse<>(Collections.emptyList(),
+                                       page,
+                                       UIConstants.MINIMUM_COMMENTS_PER_POST,
+                                       0,
+                                       0,
+                                       false);
+        }
+
+        // Get social user
+        UserEntity socialUser = userService.findById(authUser.id());
+        return processCommentsToPagedResponse(socialUser, topLevelComments, toplevelCommentsPage);
     }
 
     /**
-     * Get replies from comment
+     * Get replies in a comment
      *
+     * @param postId
+     *            - Post ID
      * @param commentId
      *            - Comment ID
-     * @param pageable
-     *            - Pageable
-     * @return Page<CommentEntity>
+     * @param page
+     *            - page
+     * @return PagedResponse<CommentResponse>
      */
-    public Page<CommentEntity> getReplies(String commentId, Pageable pageable) {
-        LoggerUtility.d(clazz, String.format("Execute method: [getReplies] commentId: [%s]", commentId));
-        return commentRepository.findByParentCommentIdOrderByCreatedAtAsc(commentId, pageable);
+    public PagedResponse<CommentResponse> getReplies(String postId, String commentId, int page) {
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [getReplies] postId: [%s] commentId: [%s] page: [%s]",
+                                      postId,
+                                      commentId,
+                                      page));
+
+        // Get auth user
+        AuthUser authUser = authService.getAuthUser();
+
+        // Get post
+        PostEntity post = postService.getPostById(postId);
+
+        // Get comment
+        CommentEntity parentComment = getCommentById(commentId);
+
+        // Validate ownership
+        if (!parentComment.getPostId().equals(post.getId())) {
+            throw new BadRequestException(CommentErrorConstants.THE_COMMENT_DOES_NOT_BELONG_TO_THE_SPECIFIED_POST);
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, UIConstants.MINIMUM_REPLIES_PER_COMMENT);
+        Page<CommentEntity> repliesPage = commentRepository.findByParentCommentIdOrderByCreatedAtAsc(commentId,
+                                                                                                     pageRequest);
+        List<CommentEntity> replies = repliesPage.getContent();
+        LoggerUtility.d(clazz, String.format("replies size: [%s]", replies.size()));
+
+        if (CollectionUtils.isEmpty(replies)) {
+            LoggerUtility.d(clazz, "replies are empty");
+            return new PagedResponse<>(Collections.emptyList(),
+                                       page,
+                                       UIConstants.MINIMUM_REPLIES_PER_COMMENT,
+                                       0,
+                                       0,
+                                       false);
+        }
+
+        // Get social user
+        UserEntity socialUser = userService.findById(authUser.id());
+        return processCommentsToPagedResponse(socialUser, replies, repliesPage);
+    }
+
+    private PagedResponse<CommentResponse> processCommentsToPagedResponse(UserEntity socialUser,
+                                                                          List<CommentEntity> comments,
+                                                                          Page<CommentEntity> commentsPage) {
+        LoggerUtility.d(clazz, "processCommentsToPagedResponse");
+
+        // Get authorIds
+        Set<String> authorIds = ExtractorUtils.extractToSet(comments, CommentEntity::getAuthorId);
+        LoggerUtility.d(clazz, String.format("authorIds size: [%s]", authorIds.size()));
+
+        // Get authors
+        List<UserEntity> authors = userService.findByIdIn(authorIds.stream().toList());
+        LoggerUtility.d(clazz, String.format("authors size: [%s]", authors.size()));
+
+        // Get users tied to authorIds
+        Map<String, UserEntity> usersById = ExtractorUtils.extractToMap(authors,
+                                                                        UserEntity::getId,
+                                                                        Function.identity());
+        LoggerUtility.d(clazz, String.format("usersById size: [%s]", usersById.size()));
+
+        // Extract all comments's id
+        List<String> commentIds = ExtractorUtils.extractToList(comments, CommentEntity::getId);
+        LoggerUtility.d(clazz, String.format("commentIds size: [%s]", commentIds.size()));
+
+        // Get likedCommentIds
+        Set<String> likedCommentIds = commentLikeService.getLikedCommentIds(commentIds, socialUser.getId());
+        LoggerUtility.d(clazz, String.format("likedCommentIds size: [%s]", likedCommentIds.size()));
+
+        List<CommentResponse> response = comments.stream().map(comment -> {
+            UserEntity author = usersById.get(comment.getAuthorId());
+            boolean isLikedByCurrentUser = likedCommentIds.contains(comment.getId());
+            return CommentMapper.toResponse(comment, author, isLikedByCurrentUser);
+        }).toList();
+
+        return new PagedResponse<>(response,
+                                   commentsPage.getNumber(),
+                                   commentsPage.getSize(),
+                                   commentsPage.getTotalElements(),
+                                   commentsPage.getTotalPages(),
+                                   commentsPage.hasNext());
     }
 
     /**

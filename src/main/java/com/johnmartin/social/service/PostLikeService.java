@@ -1,9 +1,7 @@
 package com.johnmartin.social.service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -11,6 +9,7 @@ import com.johnmartin.social.entities.PostLikeEntity;
 import com.johnmartin.social.repository.PostLikeRepository;
 import com.johnmartin.social.repository.PostRepository;
 import com.johnmartin.social.utilities.LoggerUtility;
+import com.johnmartin.social.utils.ExtractorUtils;
 
 import jakarta.transaction.Transactional;
 
@@ -63,10 +62,10 @@ public class PostLikeService {
                         String.format("Execute method: [getLikedPostIds]  postIds: [%s] userId: [%s]",
                                       postIds,
                                       userId));
-        return postLikeRepository.findByUserIdAndPostIdIn(userId, postIds)
-                                 .stream()
-                                 .map(PostLikeEntity::getPostId)
-                                 .collect(Collectors.toSet());
+
+        List<PostLikeEntity> likedPostIds = postLikeRepository.findByUserIdAndPostIdIn(userId, postIds);
+        LoggerUtility.d(clazz, String.format("likedPostIds size: [%s]", likedPostIds.size()));
+        return ExtractorUtils.extractToSet(likedPostIds, PostLikeEntity::getPostId);
     }
 
     public boolean isPostLikedByUser(String postId, String userId) {
