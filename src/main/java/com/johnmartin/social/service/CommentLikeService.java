@@ -25,6 +25,15 @@ public class CommentLikeService {
         this.commentRepository = commentRepository;
     }
 
+    /***
+     * Store entity that indicates a liked comment, catch exception if has duplicate
+     *
+     * @param commentId
+     *            - Comment ID
+     * @param userId
+     *            - User ID
+     * @return boolean
+     */
     @Transactional
     public boolean toggleLike(String commentId, String userId) {
         LoggerUtility.d(clazz,

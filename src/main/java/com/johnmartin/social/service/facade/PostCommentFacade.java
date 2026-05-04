@@ -203,16 +203,20 @@ public class PostCommentFacade {
         // Get auth user
         AuthUser authUser = authService.getAuthUser();
 
-        boolean isLikedByCurrentUser = postLikeService.toggleLike(postId, authUser.id());
-        LoggerUtility.d(clazz, String.format("isLikedByCurrentUser: [%s]", isLikedByCurrentUser));
-
-        // Get updated post info
+        // Get post
         PostEntity post = postService.getPostById(postId);
         LoggerUtility.d(clazz, String.format("post: [%s]", post));
 
+        boolean isLikedByCurrentUser = postLikeService.toggleLike(post.getId(), authUser.id());
+        LoggerUtility.d(clazz, String.format("isLikedByCurrentUser: [%s]", isLikedByCurrentUser));
+
+        // Get updated post info after toggle like
+        PostEntity updatedPost = postService.getPostById(postId);
+        LoggerUtility.d(clazz, String.format("updatedPost: [%s]", updatedPost));
+
         // Get social user
         UserEntity socialUser = userService.findById(authUser.id());
-        boolean isOwnedByCurrentUser = socialUser.getId().equals(post.getAuthorId());
+        boolean isOwnedByCurrentUser = socialUser.getId().equals(updatedPost.getAuthorId());
         LoggerUtility.d(clazz, String.format("isOwnedByCurrentUser: [%s]", isOwnedByCurrentUser));
 
         // Get comments of liked post
@@ -221,8 +225,8 @@ public class PostCommentFacade {
         LoggerUtility.d(clazz, String.format("comments size: [%s]", comments.size()));
 
         // Get post author
-        UserEntity postAuthor = userService.findById(post.getAuthorId());
-        return PostMapper.toResponse(post,
+        UserEntity postAuthor = userService.findById(updatedPost.getAuthorId());
+        return PostMapper.toResponse(updatedPost,
                                      comments.getOrDefault(postId, Collections.emptyList()),
                                      postAuthor,
                                      isLikedByCurrentUser,

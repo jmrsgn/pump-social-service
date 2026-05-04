@@ -216,17 +216,25 @@ public class CommentService {
         LoggerUtility.d(clazz,
                         String.format("Execute method: [likeComment] postId: [%s] commentId: [%s]", postId, commentId));
 
-        // Get auth user
+        // Check if user is authenticated
         AuthUser authUser = authService.getAuthUser();
+
+        // Check if post is existing or not
+        postService.getPostById(postId);
 
         // Get comment
         CommentEntity comment = getCommentById(commentId);
         LoggerUtility.t(clazz, String.format("comment: [%s]", comment));
 
-        boolean isLiked = commentLikeService.toggleLike(comment.getId(), authUser.id());
-        // Get social user
-        UserEntity socialUser = userService.findById(authUser.id());
-        return CommentMapper.toResponse(comment, socialUser, isLiked);
+        boolean isLikedByCurrentUser = commentLikeService.toggleLike(comment.getId(), authUser.id());
+
+        // Get updated comment info after toggle like
+        CommentEntity updatedComment = getCommentById(commentId);
+        LoggerUtility.d(clazz, String.format("updatedComment: [%s]", updatedComment));
+
+        // Get comment author
+        UserEntity commentAuthor = userService.findById(updatedComment.getAuthorId());
+        return CommentMapper.toResponse(updatedComment, commentAuthor, isLikedByCurrentUser);
     }
 
     /**
