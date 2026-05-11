@@ -66,8 +66,7 @@ public class AuthContextFilter extends BaseFilter {
     @Override
     protected boolean shouldSkip(HttpServletRequest request) {
         String uri = request.getRequestURI();
-
-        return uri.startsWith(ApiConstants.Path.ACTUATOR)
-               || uri.startsWith(ApiConstants.InternalPath.API_USER_INTERNAL);
+        return uri.startsWith(ApiConstants.Path.ACTUATOR) || uri.startsWith(ApiConstants.InternalPath.API_USER_INTERNAL)
+               || uri.startsWith(ApiConstants.Path.UPLOADS);
     }
 }

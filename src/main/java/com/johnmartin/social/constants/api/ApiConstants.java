@@ -17,6 +17,7 @@ public final class ApiConstants {
 
         public static final String ACTUATOR = "/actuator";
         public static final String HEALTH = "/health";
+        public static final String UPLOADS = "/uploads";
 
         // User
         public static final String API_USER = API_BASE_V1 + "/user";
