@@ -1,9 +1,11 @@
 package com.johnmartin.social.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.error.ValidationErrorConstants;
@@ -45,9 +47,10 @@ public class PostController {
         return ResponseEntity.ok(Result.success(response));
     }
 
-    @PostMapping
-    public ResponseEntity<Result<PostResponse>> createPost(@Valid @RequestBody CreatePostRequest createPostRequest) {
-        PostResponse createdPost = postService.createPost(createPostRequest);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Result<PostResponse>> createPost(@Valid @ModelAttribute CreatePostRequest createPostRequest,
+                                                           @RequestPart(required = false) MultipartFile image) {
+        PostResponse createdPost = postService.createPost(createPostRequest, image);
         return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(createdPost));
     }
 

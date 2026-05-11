@@ -456,4 +456,8 @@ public class CommentService {
         return commentRepository.findById(commentId)
                                 .orElseThrow(() -> new NotFoundException(CommentErrorConstants.COMMENT_NOT_FOUND));
     }
+
+    public List<CommentEntity> findByPostId(String postId) {
+        return commentRepository.findByPostId(postId);
+    }
 }

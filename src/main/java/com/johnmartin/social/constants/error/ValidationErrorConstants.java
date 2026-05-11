@@ -13,4 +13,9 @@ public final class ValidationErrorConstants {
     public static final String FIRST_NAME_IS_REQUIRED = "First name is required";
     public static final String LAST_NAME_IS_REQUIRED = "Last name is required";
     public static final String EMAIL_IS_REQUIRED = "Email is required";
+
+    public static final String FILE_IS_EMPTY = "File is empty";
+
+    public static final String FAILED_TO_UPLOAD_FILE = "Failed to upload file";
+    public static final String FAILED_TO_DELETE_POST = "Failed to delete post]";
 }

@@ -18,4 +18,5 @@ public interface CommentLikeRepository extends MongoRepository<CommentLikeEntity
 
     void deleteByCommentId(String commentId);
 
+    void deleteByCommentIdIn(List<String> commentIds);
 }

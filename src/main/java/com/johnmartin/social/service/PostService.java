@@ -5,6 +5,7 @@ import java.util.Collections;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.johnmartin.social.constants.error.SystemErrorConstants;
 import com.johnmartin.social.constants.error.domain.PostErrorConstants;
@@ -13,10 +14,12 @@ import com.johnmartin.social.dto.request.CreatePostRequest;
 import com.johnmartin.social.dto.response.PostResponse;
 import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.enums.MediaType;
 import com.johnmartin.social.exception.BadRequestException;
 import com.johnmartin.social.exception.NotFoundException;
 import com.johnmartin.social.mapper.PostMapper;
 import com.johnmartin.social.repository.PostRepository;
+import com.johnmartin.social.service.media.PostImageUploadService;
 import com.johnmartin.social.utilities.LoggerUtility;
 
 @Service
@@ -28,11 +31,16 @@ public class PostService {
 
     private final UserService userService;
     private final AuthService authService;
+    private final PostImageUploadService postImageUploadService;
 
-    public PostService(PostRepository postRepository, UserService userService, AuthService authService) {
+    public PostService(PostRepository postRepository,
+                       UserService userService,
+                       AuthService authService,
+                       PostImageUploadService postImageUploadService) {
         this.postRepository = postRepository;
         this.userService = userService;
         this.authService = authService;
+        this.postImageUploadService = postImageUploadService;
     }
 
     /**
@@ -42,7 +50,7 @@ public class PostService {
      *            - CreatePostRequest
      * @return PostResponse
      */
-    public PostResponse createPost(CreatePostRequest request) {
+    public PostResponse createPost(CreatePostRequest request, MultipartFile image) {
         LoggerUtility.d(clazz, String.format("Execute method: [createPost] request: [%s]", request));
 
         if (request == null) {
@@ -52,11 +60,24 @@ public class PostService {
 
         // Get auth user
         AuthUser authUser = authService.getAuthUser();
+        String mediaUrl = null;
+        MediaType mediaType = null;
+
+        // Upload image if exists
+        if (image != null && !image.isEmpty()) {
+            LoggerUtility.d(clazz, String.format("Uploading image: [%s]", image.getOriginalFilename()));
+            mediaUrl = postImageUploadService.upload(image);
+            mediaType = MediaType.IMAGE;
+        }
 
         // Create a post
         PostEntity createdPost = new PostEntity();
         createdPost.setTitle(request.title());
         createdPost.setDescription(request.description());
+
+        createdPost.setMediaUrl(mediaUrl);
+        createdPost.setMediaType(mediaType);
+
         createdPost.setAuthorId(authUser.id());
         createdPost.setLikesCount(0);
         createdPost.setCommentsCount(0);

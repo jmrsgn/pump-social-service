@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.constants.error.SystemErrorConstants;
+import com.johnmartin.social.constants.error.ValidationErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.request.UpdatePostRequest;
 import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.dto.response.PostResponse;
 import com.johnmartin.social.dto.response.common.PagedResponse;
+import com.johnmartin.social.entities.CommentEntity;
 import com.johnmartin.social.entities.PostEntity;
 import com.johnmartin.social.entities.UserEntity;
 import com.johnmartin.social.exception.BadRequestException;
@@ -258,22 +260,36 @@ public class PostCommentFacade {
         }
 
         try {
-            // Delete all comments under the post
+            // Get all comments under the post
+            List<CommentEntity> comments = commentService.findByPostId(postId);
+
+            // Extract comment ids
+            List<String> commentIds = comments.stream().map(CommentEntity::getId).toList();
+
+            // Delete comment likes under the post
+            if (!commentIds.isEmpty()) {
+                commentLikeService.deleteByCommentIds(commentIds);
+            }
+
+            // Delete comments under the post
             commentService.deleteByPostId(postId);
 
-            // Delete likes for posts
+            // Delete post likes
             postLikeService.deleteByPostId(postId);
 
             // Delete the post
             postService.deletePost(postId);
+
+            LoggerUtility.i(clazz, String.format("Post deleted successfully. postId: [%s]", postId));
         } catch (Exception e) {
             LoggerUtility.e(clazz, String.format("Failed to delete post. error: [%s]", e.getMessage()), e);
+            throw new RuntimeException(ValidationErrorConstants.FAILED_TO_DELETE_POST);
         }
     }
 
     /**
      * Update a post
-     * 
+     *
      * @param postId
      *            - Post ID
      * @param request

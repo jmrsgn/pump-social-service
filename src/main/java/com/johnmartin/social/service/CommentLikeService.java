@@ -79,4 +79,12 @@ public class CommentLikeService {
         LoggerUtility.d(clazz, String.format("Execute method: [deleteByPostId] commentId: [%s]", commentId));
         commentLikeRepository.deleteByCommentId(commentId);
     }
+
+    @Transactional
+    public void deleteByCommentIds(List<String> commentIds) {
+        LoggerUtility.d(clazz,
+                        String.format("Execute method: [deleteByCommentIds] commentIds size: [%s]", commentIds.size()));
+
+        commentLikeRepository.deleteByCommentIdIn(commentIds);
+    }
 }
