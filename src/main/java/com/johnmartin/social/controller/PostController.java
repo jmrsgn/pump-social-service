@@ -23,7 +23,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 @Validated
 @RestController
-@RequestMapping(ApiConstants.Path.API_POST)
+@RequestMapping(ApiConstants.Path.API_POSTS)
 public class PostController {
 
     private final PostService postService;

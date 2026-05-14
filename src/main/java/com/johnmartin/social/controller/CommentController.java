@@ -17,7 +17,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 @Validated
 @RestController
-@RequestMapping(ApiConstants.Path.API_COMMENT)
+@RequestMapping(ApiConstants.Path.API_COMMENTS)
 public class CommentController {
 
     private final CommentService commentService;

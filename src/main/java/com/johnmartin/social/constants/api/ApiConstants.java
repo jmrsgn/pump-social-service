@@ -17,7 +17,6 @@ public final class ApiConstants {
 
         public static final String ACTUATOR = "/actuator";
         public static final String HEALTH = "/health";
-        public static final String UPLOADS = "/uploads";
 
         // User
         public static final String API_USER = API_BASE_V1 + "/user";
@@ -25,15 +24,19 @@ public final class ApiConstants {
         public static final String FOLLOW = USER_INFO + "/follow";
 
         // Post
-        public static final String API_POST = API_BASE_V1 + "/post";
+        public static final String API_POSTS = API_BASE_V1 + "/posts";
         public static final String POST_INFO = "/{postId}";
         public static final String POST_LIKE = POST_INFO + "/like";
 
         // Comment
-        public static final String API_COMMENT = API_POST + "/{postId}/comment";
+        public static final String API_COMMENTS = API_POSTS + "/{postId}/comments";
         public static final String COMMENT_INFO = "/{commentId}";
         public static final String COMMENT_LIKE = COMMENT_INFO + "/like";
         public static final String COMMENT_REPLIES = COMMENT_INFO + "/replies";
+
+        // AI
+        public static final String API_AI = API_BASE_V1 + "/ai";
+        public static final String CAPTIONS = "/caption";
     }
 
     public static final class InternalPath {
@@ -46,6 +49,14 @@ public final class ApiConstants {
         public static final String GET_USER = "/{userId}";
     }
 
+    public static final class StaticResource {
+
+        private StaticResource() {
+        }
+
+        public static final String UPLOADS = "/uploads";
+    }
+
     public static final class Params {
 
         private Params() {
@@ -56,9 +67,9 @@ public final class ApiConstants {
         public static final String USER_ID = "userId";
     }
 
-    public static final class Error {
+    public static final class HttpError {
 
-        private Error() {
+        private HttpError() {
         }
 
         public static final String UNAUTHORIZED = "Unauthorized";
@@ -67,15 +78,5 @@ public final class ApiConstants {
         public static final String CONFLICT = "Conflict";
         public static final String FORBIDDEN = "Forbidden";
         public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    }
-
-    public static final class PumpAuthService {
-
-        private PumpAuthService() {
-        }
-
-        // public static final String URL = "http://pump-auth-service:8080";
-        public static final String URL = "http://localhost:8081";
-        public static final String API_VALIDATE = API_BASE_V1_INTERNAL + "/auth/validate";
     }
 }

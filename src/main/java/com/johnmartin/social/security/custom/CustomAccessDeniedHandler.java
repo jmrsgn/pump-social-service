@@ -35,7 +35,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter()
                 .write(objectMapper.writeValueAsString(Result.failure(new ApiErrorResponse(HttpStatus.FORBIDDEN.value(),
-                                                                                           ApiConstants.Error.BAD_REQUEST,
+                                                                                           ApiConstants.HttpError.BAD_REQUEST,
                                                                                            AuthErrorConstants.BAD_REQUEST))));
     }
 }

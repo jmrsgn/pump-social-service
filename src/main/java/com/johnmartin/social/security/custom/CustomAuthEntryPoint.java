@@ -36,7 +36,7 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter()
                 .write(objectMapper.writeValueAsString(Result.failure(new ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(),
-                                                                                           ApiConstants.Error.UNAUTHORIZED,
+                                                                                           ApiConstants.HttpError.UNAUTHORIZED,
                                                                                            AuthErrorConstants.USER_IS_NOT_AUTHENTICATED_OR_INVALID_TOKEN))));
     }
 }

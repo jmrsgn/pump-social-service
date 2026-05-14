@@ -19,3 +19,6 @@ management:
     health:
       probes:
         enabled: true
+
+openai:
+  api-key: ${OPENAI_API_KEY}

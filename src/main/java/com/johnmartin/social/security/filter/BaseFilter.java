@@ -70,7 +70,7 @@ public abstract class BaseFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter()
                 .write(objectMapper.writeValueAsString(Result.failure(new ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(),
-                                                                                           ApiConstants.Error.UNAUTHORIZED,
+                                                                                           ApiConstants.HttpError.UNAUTHORIZED,
                                                                                            message))));
     }
 }

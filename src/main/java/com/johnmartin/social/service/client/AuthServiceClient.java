@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClient;
 import com.johnmartin.social.constants.SecurityConstants;
 import com.johnmartin.social.constants.UIConstants;
 import com.johnmartin.social.constants.api.ApiConstants;
+import com.johnmartin.social.constants.api.ExternalServiceConstants;
 import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.constants.error.ExternalServiceErrorConstants;
 import com.johnmartin.social.dto.internal.AuthUserResponse;
@@ -30,7 +31,7 @@ public class AuthServiceClient {
     public AuthUserResponse validate(String authorizationHeader, String requestId) {
         try {
             Result<AuthUserResponse> result = authWebClient.post()
-                                                           .uri(ApiConstants.PumpAuthService.API_VALIDATE)
+                                                           .uri(ExternalServiceConstants.PumpAuthService.API_VALIDATE)
                                                            .header(HttpHeaders.AUTHORIZATION, authorizationHeader)
                                                            .header(SecurityConstants.HttpHeaders.REQUEST_ID, requestId)
                                                            .retrieve()
