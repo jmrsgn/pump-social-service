@@ -1,4 +1,4 @@
-package com.johnmartin.social.exception;
+package com.johnmartin.social.exceptions;
 
 public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException() {

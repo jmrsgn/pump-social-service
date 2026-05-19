@@ -8,8 +8,8 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import com.johnmartin.social.dto.response.CommentResponse;
 import com.johnmartin.social.dto.response.PostResponse;
-import com.johnmartin.social.entities.PostEntity;
-import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.entity.PostEntity;
+import com.johnmartin.social.entity.UserEntity;
 
 public class PostMapper {
 

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.entity.UserEntity;
 import com.johnmartin.social.repository.custom.UserRepositoryCustom;
 
 @Repository

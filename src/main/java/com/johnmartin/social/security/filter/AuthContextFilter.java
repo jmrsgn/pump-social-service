@@ -11,7 +11,7 @@ import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.internal.AuthUserResponse;
-import com.johnmartin.social.exception.UnauthorizedException;
+import com.johnmartin.social.exceptions.UnauthorizedException;
 import com.johnmartin.social.mapper.UserMapper;
 import com.johnmartin.social.security.AuthContext;
 import com.johnmartin.social.service.client.AuthServiceClient;

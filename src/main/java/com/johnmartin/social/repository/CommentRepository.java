@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.johnmartin.social.entities.CommentEntity;
+import com.johnmartin.social.entity.CommentEntity;
 import com.johnmartin.social.repository.custom.CommentRepositoryCustom;
 
 @Repository

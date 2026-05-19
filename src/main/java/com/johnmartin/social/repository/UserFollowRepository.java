@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import com.johnmartin.social.entities.UserFollowEntity;
+import com.johnmartin.social.entity.UserFollowEntity;
 
 public interface UserFollowRepository extends MongoRepository<UserFollowEntity, String> {
 

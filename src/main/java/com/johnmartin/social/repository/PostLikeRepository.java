@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.johnmartin.social.entities.PostLikeEntity;
+import com.johnmartin.social.entity.PostLikeEntity;
 
 @Repository
 public interface PostLikeRepository extends MongoRepository<PostLikeEntity, String> {

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.entities.PostLikeEntity;
+import com.johnmartin.social.entity.PostLikeEntity;
 import com.johnmartin.social.repository.PostLikeRepository;
 import com.johnmartin.social.repository.PostRepository;
 import com.johnmartin.social.utilities.LoggerUtility;

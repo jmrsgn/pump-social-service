@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.johnmartin.social.entities.PostEntity;
+import com.johnmartin.social.entity.PostEntity;
 import com.johnmartin.social.repository.custom.PostRepositoryCustom;
 
 @Repository

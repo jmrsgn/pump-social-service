@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import com.johnmartin.social.constants.entities.PostEntityConstants;
-import com.johnmartin.social.entities.PostEntity;
+import com.johnmartin.social.entity.PostEntity;
 
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 

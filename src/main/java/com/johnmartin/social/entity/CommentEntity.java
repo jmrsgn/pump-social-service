@@ -1,4 +1,4 @@
-package com.johnmartin.social.entities;
+package com.johnmartin.social.entity;
 
 import java.time.Instant;
 

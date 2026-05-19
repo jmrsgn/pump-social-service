@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import com.johnmartin.social.constants.entities.UserEntityConstants;
-import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.entity.UserEntity;
 
 public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.johnmartin.social.entities.CommentLikeEntity;
+import com.johnmartin.social.entity.CommentLikeEntity;
 import com.johnmartin.social.repository.CommentLikeRepository;
 import com.johnmartin.social.repository.CommentRepository;
 import com.johnmartin.social.utilities.LoggerUtility;

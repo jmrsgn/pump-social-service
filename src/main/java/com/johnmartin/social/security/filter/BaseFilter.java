@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.dto.response.common.ApiErrorResponse;
 import com.johnmartin.social.dto.response.common.Result;
-import com.johnmartin.social.exception.UnauthorizedException;
+import com.johnmartin.social.exceptions.UnauthorizedException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -3,8 +3,8 @@ package com.johnmartin.social.service;
 import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.error.domain.UserFollowErrorConstants;
-import com.johnmartin.social.entities.UserFollowEntity;
-import com.johnmartin.social.exception.BadRequestException;
+import com.johnmartin.social.entity.UserFollowEntity;
+import com.johnmartin.social.exceptions.BadRequestException;
 import com.johnmartin.social.repository.UserFollowRepository;
 import com.johnmartin.social.repository.UserRepository;
 import com.johnmartin.social.utilities.LoggerUtility;

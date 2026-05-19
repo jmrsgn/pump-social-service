@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.johnmartin.social.entities.CommentLikeEntity;
+import com.johnmartin.social.entity.CommentLikeEntity;
 
 @Repository
 public interface CommentLikeRepository extends MongoRepository<CommentLikeEntity, String> {

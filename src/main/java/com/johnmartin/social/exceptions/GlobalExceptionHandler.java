@@ -1,4 +1,4 @@
-package com.johnmartin.social.exception;
+package com.johnmartin.social.exceptions;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;

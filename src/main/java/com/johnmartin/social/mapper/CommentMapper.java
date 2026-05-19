@@ -1,8 +1,8 @@
 package com.johnmartin.social.mapper;
 
 import com.johnmartin.social.dto.response.CommentResponse;
-import com.johnmartin.social.entities.CommentEntity;
-import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.entity.CommentEntity;
+import com.johnmartin.social.entity.UserEntity;
 
 public class CommentMapper {
 

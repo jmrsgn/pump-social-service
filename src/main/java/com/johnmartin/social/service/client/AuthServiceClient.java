@@ -16,7 +16,7 @@ import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.constants.error.ExternalServiceErrorConstants;
 import com.johnmartin.social.dto.internal.AuthUserResponse;
 import com.johnmartin.social.dto.response.common.Result;
-import com.johnmartin.social.exception.UnauthorizedException;
+import com.johnmartin.social.exceptions.UnauthorizedException;
 
 @Service
 public class AuthServiceClient {

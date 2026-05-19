@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import com.johnmartin.social.constants.entities.CommentEntityConstants;
-import com.johnmartin.social.entities.CommentEntity;
+import com.johnmartin.social.entity.CommentEntity;
 
 public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
 

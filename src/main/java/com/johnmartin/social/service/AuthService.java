@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.johnmartin.social.constants.error.AuthErrorConstants;
 import com.johnmartin.social.dto.AuthUser;
-import com.johnmartin.social.exception.UnauthorizedException;
+import com.johnmartin.social.exceptions.UnauthorizedException;
 import com.johnmartin.social.security.AuthContext;
 import com.johnmartin.social.utilities.LoggerUtility;
 

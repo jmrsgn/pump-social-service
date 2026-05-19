@@ -3,7 +3,7 @@ package com.johnmartin.social.mapper;
 import com.johnmartin.social.dto.AuthUser;
 import com.johnmartin.social.dto.internal.AuthUserResponse;
 import com.johnmartin.social.dto.response.UserResponse;
-import com.johnmartin.social.entities.UserEntity;
+import com.johnmartin.social.entity.UserEntity;
 
 public class UserMapper {
 

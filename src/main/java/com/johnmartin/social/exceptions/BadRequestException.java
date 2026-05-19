@@ -1,4 +1,4 @@
-package com.johnmartin.social.exception;
+package com.johnmartin.social.exceptions;
 
 public class BadRequestException extends RuntimeException {
     public BadRequestException() {
