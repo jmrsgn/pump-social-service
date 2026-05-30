@@ -21,22 +21,24 @@ import com.johnmartin.social.exceptions.UnauthorizedException;
 @Service
 public class AuthServiceClient {
 
-    private final RestClient authWebClient;
+    private final RestClient authServiceRestClient;
 
-    public AuthServiceClient(RestClient authWebClient) {
-        this.authWebClient = authWebClient;
+    public AuthServiceClient(RestClient authServiceRestClient) {
+        this.authServiceRestClient = authServiceRestClient;
     }
 
     @Retryable(retryFor = Exception.class, maxAttempts = ApiConstants.RETRIES_COUNT, backoff = @Backoff(delay = UIConstants.DELAY_2000))
     public AuthUserResponse validate(String authorizationHeader, String requestId) {
         try {
-            Result<AuthUserResponse> result = authWebClient.post()
-                                                           .uri(ExternalServiceConstants.PumpAuthService.API_VALIDATE)
-                                                           .header(HttpHeaders.AUTHORIZATION, authorizationHeader)
-                                                           .header(SecurityConstants.HttpHeaders.REQUEST_ID, requestId)
-                                                           .retrieve()
-                                                           .body(new ParameterizedTypeReference<>() {
-                                                           });
+            Result<AuthUserResponse> result = authServiceRestClient.post()
+                                                                   .uri(ExternalServiceConstants.PumpAuthService.API_VALIDATE)
+                                                                   .header(HttpHeaders.AUTHORIZATION,
+                                                                           authorizationHeader)
+                                                                   .header(SecurityConstants.HttpHeaders.REQUEST_ID,
+                                                                           requestId)
+                                                                   .retrieve()
+                                                                   .body(new ParameterizedTypeReference<>() {
+                                                                   });
 
             if (result == null || result.getData().isEmpty()) {
                 throw new RuntimeException(ExternalServiceErrorConstants.AUTH_USER_NOT_FOUND);
