@@ -1,5 +1,7 @@
 package com.johnmartin.social.controller.internal;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.error.ValidationErrorConstants;
 import com.johnmartin.social.dto.request.CreateUserRequest;
+import com.johnmartin.social.dto.request.GetUsersRequest;
 import com.johnmartin.social.dto.response.UserResponse;
+import com.johnmartin.social.dto.response.UserSummaryResponse;
 import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.service.UserService;
 
@@ -36,5 +40,11 @@ public class InternalUserController {
     public ResponseEntity<Result<UserResponse>> getUser(@PathVariable(ApiConstants.Params.USER_ID) @NotBlank(message = ValidationErrorConstants.USER_ID_IS_REQUIRED) String userId) {
         UserResponse user = userService.getUserById(userId);
         return ResponseEntity.ok(Result.success(user));
+    }
+
+    @PostMapping
+    public ResponseEntity<Result<List<UserSummaryResponse>>> getUsersByIds(@RequestBody GetUsersRequest request) {
+        List<UserSummaryResponse> users = userService.getUsersByIds(request.userIds());
+        return ResponseEntity.ok(Result.success(users));
     }
 }

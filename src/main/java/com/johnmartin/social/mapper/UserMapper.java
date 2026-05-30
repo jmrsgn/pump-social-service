@@ -1,8 +1,9 @@
 package com.johnmartin.social.mapper;
 
 import com.johnmartin.social.dto.AuthUser;
-import com.johnmartin.social.dto.internal.AuthUserResponse;
+import com.johnmartin.social.dto.response.internal.AuthUserResponse;
 import com.johnmartin.social.dto.response.UserResponse;
+import com.johnmartin.social.dto.response.UserSummaryResponse;
 import com.johnmartin.social.entity.UserEntity;
 
 public class UserMapper {
@@ -28,5 +29,12 @@ public class UserMapper {
                             authUserResponse.lastName(),
                             authUserResponse.email(),
                             authUserResponse.phone());
+    }
+
+    public static UserSummaryResponse toSummaryResponse(UserEntity userEntity) {
+        return new UserSummaryResponse(userEntity.getId(),
+                                       userEntity.getFirstName(),
+                                       userEntity.getLastName(),
+                                       userEntity.getProfileImageUrl());
     }
 }
