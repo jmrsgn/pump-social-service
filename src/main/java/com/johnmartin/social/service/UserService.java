@@ -1,5 +1,6 @@
 package com.johnmartin.social.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -88,6 +89,29 @@ public class UserService {
         List<UserEntity> users = userRepository.findByIdIn(userIds);
         LoggerUtility.logItemSize(clazz, "users", users);
 
+        return users.stream().map(UserMapper::toSummaryResponse).toList();
+    }
+
+    /**
+     * Search users
+     * 
+     * @param query
+     *            - Filter
+     * @return List<UserSummaryResponse>
+     */
+    public List<UserSummaryResponse> searchUsers(String query) {
+        LoggerUtility.d(clazz, String.format("Execute method: [searchUsers] query: [%s]", query));
+
+        authService.getAuthUser();
+
+        if (StringUtils.isBlank(query)) {
+            return Collections.emptyList();
+        }
+
+        List<UserEntity> users = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(query,
+                                                                                                                  query);
+
+        LoggerUtility.logItemSize(clazz, "users", users);
         return users.stream().map(UserMapper::toSummaryResponse).toList();
     }
 }

@@ -26,6 +26,6 @@ public final class ExternalServiceConstants {
         // "http://pump-auth-service:8080";
 
         public static final String BASE_URL = "http://localhost:8081";
-        public static final String API_VALIDATE = API_BASE_V1_INTERNAL + "/api/v1/internal/auth/validate";
+        public static final String API_VALIDATE = API_BASE_V1_INTERNAL + "/auth/validate";
     }
 }

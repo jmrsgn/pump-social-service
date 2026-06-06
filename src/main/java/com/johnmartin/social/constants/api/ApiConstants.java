@@ -22,6 +22,7 @@ public final class ApiConstants {
         public static final String API_USER = API_BASE_V1 + "/user";
         public static final String USER_INFO = "/{userId}";
         public static final String FOLLOW = USER_INFO + "/follow";
+        public static final String SEARCH = "/search";
 
         // Post
         public static final String API_POSTS = API_BASE_V1 + "/posts";
@@ -44,7 +45,8 @@ public final class ApiConstants {
         private InternalPath() {
         }
 
-        public static final String API_USER_INTERNAL = API_BASE_V1_INTERNAL + "/users";
+        public static final String API_SOCIAL_INTERNAL = API_BASE_V1_INTERNAL + "/social";
+        public static final String API_USER_INTERNAL = API_SOCIAL_INTERNAL + "/users";
         public static final String CREATE_USER = "/create";
         public static final String GET_USER = "/{userId}";
     }

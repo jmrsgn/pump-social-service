@@ -12,4 +12,7 @@ import com.johnmartin.social.repository.custom.UserRepositoryCustom;
 public interface UserRepository extends MongoRepository<UserEntity, String>, UserRepositoryCustom {
 
     List<UserEntity> findByIdIn(List<String> ids);
+
+    List<UserEntity> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstName,
+                                                                                       String lastName);
 }
