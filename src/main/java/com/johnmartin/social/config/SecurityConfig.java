@@ -61,9 +61,9 @@ public class SecurityConfig {
                                                                           ApiConstants.Path.ACTUATOR + ApiConstants.Path.HEALTH
                                                                                                       + "/**")
                                                          .permitAll()
-                                                         .requestMatchers(ApiConstants.InternalPath.API_SOCIAL_INTERNAL,
-                                                                          ApiConstants.InternalPath.API_SOCIAL_INTERNAL + ApiConstants.InternalPath.CREATE_USER,
-                                                                          ApiConstants.InternalPath.API_SOCIAL_INTERNAL + ApiConstants.InternalPath.GET_USER,
+                                                         .requestMatchers(ApiConstants.InternalPath.API_USER_INTERNAL,
+                                                                          ApiConstants.InternalPath.API_USER_INTERNAL + ApiConstants.InternalPath.CREATE_USER,
+                                                                          ApiConstants.InternalPath.API_USER_INTERNAL + ApiConstants.InternalPath.GET_USER,
                                                                           ApiConstants.StaticResource.UPLOADS + "/**")
                                                          .permitAll()
                                                          .requestMatchers(ApiConstants.Path.ACTUATOR + "/**")
