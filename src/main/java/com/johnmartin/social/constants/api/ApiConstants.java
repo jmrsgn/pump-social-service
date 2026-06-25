@@ -48,6 +48,7 @@ public final class ApiConstants {
         public static final String API_SOCIAL_INTERNAL = API_BASE_V1_INTERNAL + "/social";
         public static final String API_USER_INTERNAL = API_SOCIAL_INTERNAL + "/users";
         public static final String CREATE_USER = "/create";
+        public static final String SEARCH_USER = "/search";
         public static final String GET_USER = "/{userId}";
     }
 
@@ -67,6 +68,7 @@ public final class ApiConstants {
         public static final String POST_ID = "postId";
         public static final String COMMENT_ID = "commentId";
         public static final String USER_ID = "userId";
+        public static final String QUERY = "query";
     }
 
     public static final class HttpError {

@@ -47,4 +47,10 @@ public class InternalUserController {
         List<UserSummaryResponse> users = userService.getUsersByIds(request.userIds());
         return ResponseEntity.ok(Result.success(users));
     }
+
+    @GetMapping(ApiConstants.InternalPath.SEARCH_USER)
+    public ResponseEntity<Result<List<UserSummaryResponse>>> searchUsers(@RequestParam(ApiConstants.Params.QUERY) String query) {
+        List<UserSummaryResponse> users = userService.searchUsers(query);
+        return ResponseEntity.ok(Result.success(users));
+    }
 }
