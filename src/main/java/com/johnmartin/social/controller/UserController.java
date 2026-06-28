@@ -1,14 +1,14 @@
 package com.johnmartin.social.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.johnmartin.social.constants.api.ApiConstants;
 import com.johnmartin.social.constants.error.ValidationErrorConstants;
 import com.johnmartin.social.dto.response.UserResponse;
-import com.johnmartin.social.dto.response.UserSummaryResponse;
 import com.johnmartin.social.dto.response.common.Result;
 import com.johnmartin.social.service.UserService;
 
@@ -30,9 +30,9 @@ public class UserController {
         return ResponseEntity.ok(Result.success(followedUser));
     }
 
-    @GetMapping(ApiConstants.Path.SEARCH)
-    public ResponseEntity<Result<List<UserSummaryResponse>>> searchUsers(@RequestParam String query) {
-        List<UserSummaryResponse> users = userService.searchUsers(query);
-        return ResponseEntity.ok(Result.success(users));
-    }
+    // @GetMapping(ApiConstants.Path.SEARCH)
+    // public ResponseEntity<Result<List<UserSummaryResponse>>> searchUsers(@RequestParam String query) {
+    // List<UserSummaryResponse> users = userService.searchUsers(query);
+    // return ResponseEntity.ok(Result.success(users));
+    // }
 }

@@ -102,8 +102,6 @@ public class UserService {
     public List<UserSummaryResponse> searchUsers(String query) {
         LoggerUtility.d(clazz, String.format("Execute method: [searchUsers] query: [%s]", query));
 
-        authService.getAuthUser();
-
         if (StringUtils.isBlank(query)) {
             return Collections.emptyList();
         }
@@ -112,6 +110,8 @@ public class UserService {
                                                                                                                   query);
 
         LoggerUtility.logItemSize(clazz, "users", users);
-        return users.stream().map(UserMapper::toSummaryResponse).toList();
+        List<UserSummaryResponse> userSummaryResponseList = users.stream().map(UserMapper::toSummaryResponse).toList();
+        LoggerUtility.logItemSize(clazz, "userSummaryResponseList", userSummaryResponseList);
+        return userSummaryResponseList;
     }
 }
