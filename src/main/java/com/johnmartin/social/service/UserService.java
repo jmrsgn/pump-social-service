@@ -102,12 +102,13 @@ public class UserService {
     public List<UserSummaryResponse> searchUsers(String query) {
         LoggerUtility.d(clazz, String.format("Execute method: [searchUsers] query: [%s]", query));
 
+        AuthUser authUser = authService.getAuthUser();
+
         if (StringUtils.isBlank(query)) {
             return Collections.emptyList();
         }
 
-        List<UserEntity> users = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(query,
-                                                                                                                  query);
+        List<UserEntity> users = userRepository.searchUsers(authUser.id(), query);
 
         LoggerUtility.logItemSize(clazz, "users", users);
         List<UserSummaryResponse> userSummaryResponseList = users.stream().map(UserMapper::toSummaryResponse).toList();

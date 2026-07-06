@@ -22,3 +22,7 @@ management:
 
 openai:
   api-key: ${OPENAI_API_KEY}
+
+pump:
+  security:
+    internal-service-token: ${PUMP_INTERNAL_SERVICE_TOKEN}
