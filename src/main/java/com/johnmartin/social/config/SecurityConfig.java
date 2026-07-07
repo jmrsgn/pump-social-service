@@ -31,10 +31,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthContextFilter authContextFilter(AuthServiceClient authService,
+    public AuthContextFilter authContextFilter(AuthServiceClient authServiceClient,
                                                ObjectMapper objectMapper,
                                                @Value("${pump.security.internal-service-token}") String internalServiceToken) {
-        return new AuthContextFilter(authService, objectMapper, internalServiceToken);
+        return new AuthContextFilter(authServiceClient, objectMapper, internalServiceToken);
     }
 
     /**

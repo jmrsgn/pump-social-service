@@ -24,13 +24,15 @@ public class AuthContextFilter extends BaseFilter {
 
     private static final Class<AuthContextFilter> clazz = AuthContextFilter.class;
 
-    private final AuthServiceClient authService;
+    private final AuthServiceClient authServiceClient;
 
     private final String internalServiceToken;
 
-    public AuthContextFilter(AuthServiceClient authService, ObjectMapper objectMapper, String internalServiceToken) {
+    public AuthContextFilter(AuthServiceClient authServiceClient,
+                             ObjectMapper objectMapper,
+                             String internalServiceToken) {
         super(objectMapper);
-        this.authService = authService;
+        this.authServiceClient = authServiceClient;
         this.internalServiceToken = internalServiceToken;
     }
 
@@ -80,7 +82,7 @@ public class AuthContextFilter extends BaseFilter {
     private void authenticateUserRequest(String authHeader, String requestId) {
         LoggerUtility.d(clazz, "Execute method: [authenticateUserRequest]");
         LoggerUtility.d(clazz, String.format("requestId: [%s]", requestId));
-        AuthUserResponse response = authService.validate(authHeader, requestId);
+        AuthUserResponse response = authServiceClient.validate(authHeader, requestId);
         authenticate(UserMapper.toAuthUser(response));
     }
 
