@@ -29,10 +29,4 @@ public class UserController {
         UserResponse followedUser = userService.followUser(userId);
         return ResponseEntity.ok(Result.success(followedUser));
     }
-
-    // @GetMapping(ApiConstants.Path.SEARCH)
-    // public ResponseEntity<Result<List<UserSummaryResponse>>> searchUsers(@RequestParam String query) {
-    // List<UserSummaryResponse> users = userService.searchUsers(query);
-    // return ResponseEntity.ok(Result.success(users));
-    // }
 }

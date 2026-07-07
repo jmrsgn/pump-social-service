@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
+import com.johnmartin.social.constants.SecurityConstants;
 import com.johnmartin.social.constants.api.ExternalServiceConstants;
 
 @Configuration
@@ -19,7 +20,7 @@ public class OpenAiClientConfig {
     public RestClient openAiRestClient() {
         return RestClient.builder()
                          .baseUrl(ExternalServiceConstants.OpenAI.BASE_URL)
-                         .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                         .defaultHeader(HttpHeaders.AUTHORIZATION, SecurityConstants.HttpHeaders.BEARER + apiKey)
                          .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                          .build();
     }

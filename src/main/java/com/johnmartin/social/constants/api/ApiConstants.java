@@ -22,7 +22,6 @@ public final class ApiConstants {
         public static final String API_USER = API_BASE_V1 + "/user";
         public static final String USER_INFO = "/{userId}";
         public static final String FOLLOW = USER_INFO + "/follow";
-        public static final String SEARCH = "/search";
 
         // Post
         public static final String API_POSTS = API_BASE_V1 + "/posts";
