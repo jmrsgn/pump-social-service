@@ -1,10 +1,13 @@
 server:
   port: 8080
 
-auth:
-  service:
-    url: http://pump-auth-service:8080
+# Services
+external-services:
+  auth:
+    service:
+      url: http://pump-auth-service:8080
 
+# Logging
 logging:
   level:
     com.johnmartin.social: INFO
