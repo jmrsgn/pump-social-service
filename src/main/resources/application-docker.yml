@@ -4,8 +4,7 @@ server:
 # Services
 external-services:
   auth:
-    service:
-      url: http://pump-auth-service:8080
+    url: http://pump-auth-service:8080
 
 # Logging
 logging:
